@@ -30,7 +30,7 @@ class StampDialog(QDialog):
     
     def setup_ui(self):
         """Set up the dialog UI."""
-        self.setWindowTitle("Add/Edit Stamp" if not self.stamp else "Edit Stamp")
+        self.setWindowTitle("Add Stamp" if not self.stamp else "Edit Stamp")
         self.setMinimumWidth(500)
         
         layout = QVBoxLayout()
