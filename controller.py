@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QFileDialog, QMessageBox
 from typing import Optional, List
 
 from model import StampDatabase, Stamp
-from view import MainWindow, StampDialog
+from view import MainWindow, StampDialog, StatisticsDialog
 
 
 class StampController:
@@ -26,6 +26,7 @@ class StampController:
         self.view.delete_stamp_requested.connect(self.delete_stamp)
         self.view.stamp_selected.connect(self.show_stamp_details)
         self.view.country_filter_changed.connect(self.on_country_filter_changed)
+        self.view.statistics_requested.connect(self.show_statistics)
     
     def run(self):
         """Start the application."""
@@ -262,3 +263,11 @@ class StampController:
             self.view.set_status_message(f"Showing all stamps ({len(filtered_stamps)} total)")
         else:
             self.view.set_status_message(f"Filtered by {country} ({len(filtered_stamps)} stamps)")
+    
+    def show_statistics(self):
+        """Display statistics dialog."""
+        country_stats = self.database.get_country_statistics()
+        total_count = self.database.get_total_count()
+        
+        dialog = StatisticsDialog(self.view, country_stats, total_count)
+        dialog.exec()

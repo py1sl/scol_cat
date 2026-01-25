@@ -348,3 +348,56 @@ class TestStampDatabase:
         assert 'version' in data['metadata']
         assert 'last_modified' in data['metadata']
         assert data['metadata']['version'] == '1.0'
+    
+    def test_get_country_statistics_empty(self, db):
+        """Test getting country statistics from empty database."""
+        stats = db.get_country_statistics()
+        assert stats == {}
+    
+    def test_get_country_statistics(self, db):
+        """Test getting country statistics."""
+        stamps = [
+            Stamp(name="Stamp 1", country="United Kingdom"),
+            Stamp(name="Stamp 2", country="United Kingdom"),
+            Stamp(name="Stamp 3", country="France"),
+            Stamp(name="Stamp 4", country="Germany"),
+            Stamp(name="Stamp 5", country="France"),
+        ]
+        for stamp in stamps:
+            db.add_stamp(stamp)
+        
+        stats = db.get_country_statistics()
+        
+        assert len(stats) == 3
+        assert stats["United Kingdom"] == 2
+        assert stats["France"] == 2
+        assert stats["Germany"] == 1
+    
+    def test_get_country_statistics_with_empty_country(self, db):
+        """Test country statistics with empty country names."""
+        stamps = [
+            Stamp(name="Stamp 1", country="France"),
+            Stamp(name="Stamp 2", country=""),
+            Stamp(name="Stamp 3", country="   "),
+            Stamp(name="Stamp 4", country="France"),
+        ]
+        for stamp in stamps:
+            db.add_stamp(stamp)
+        
+        stats = db.get_country_statistics()
+        
+        assert stats["France"] == 2
+        assert stats["Unknown"] == 2
+    
+    def test_get_total_count(self, db, sample_stamps):
+        """Test getting total stamp count."""
+        assert db.get_total_count() == 0
+        
+        db.add_stamp(sample_stamps[0])
+        assert db.get_total_count() == 1
+        
+        db.add_stamp(sample_stamps[1])
+        assert db.get_total_count() == 2
+        
+        db.delete_stamp("stamp-001")
+        assert db.get_total_count() == 1
