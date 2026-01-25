@@ -9,8 +9,6 @@ addopts = [
     "--tb=short",
     "--cov=.",
     "--cov-report=term-missing",
-    "--cov-report=xml",
-    "--cov-report=html",
 ]
 
 [tool.coverage.run]
