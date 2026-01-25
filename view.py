@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
     QListWidget, QLabel, QLineEdit, QTextEdit, QFileDialog,
     QMessageBox, QDialog, QFormLayout, QListWidgetItem, QScrollArea,
-    QSplitter, QGroupBox, QComboBox
+    QSplitter, QGroupBox, QComboBox, QTableWidget, QTableWidgetItem, QHeaderView
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap, QAction
@@ -231,6 +231,74 @@ class StampDetailsWidget(QWidget):
         self.image_label.setText("Select a stamp to view details")
 
 
+class StatisticsDialog(QDialog):
+    """Dialog for displaying collection statistics."""
+    
+    def __init__(self, parent=None, country_stats: dict = None, total_count: int = 0):
+        super().__init__(parent)
+        self.country_stats = country_stats or {}
+        self.total_count = total_count
+        self.setup_ui()
+    
+    def setup_ui(self):
+        """Set up the statistics dialog UI."""
+        self.setWindowTitle("Collection Statistics")
+        self.setMinimumSize(500, 400)
+        
+        layout = QVBoxLayout()
+        
+        # Summary section
+        summary_group = QGroupBox("Summary")
+        summary_layout = QFormLayout()
+        
+        total_label = QLabel(str(self.total_count))
+        summary_layout.addRow("Total Stamps:", total_label)
+        
+        countries_label = QLabel(str(len(self.country_stats)))
+        summary_layout.addRow("Total Countries:", countries_label)
+        
+        summary_group.setLayout(summary_layout)
+        layout.addWidget(summary_group)
+        
+        # Country statistics table
+        table_label = QLabel("Stamps by Country:")
+        layout.addWidget(table_label)
+        
+        self.table = QTableWidget()
+        self.table.setColumnCount(2)
+        self.table.setHorizontalHeaderLabels(["Country", "Number of Stamps"])
+        self.table.horizontalHeader().setStretchLastSection(True)
+        self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setSelectionBehavior(QTableWidget.SelectRows)
+        
+        # Sort countries by count (descending) then by name
+        sorted_countries = sorted(
+            self.country_stats.items(),
+            key=lambda x: (-x[1], x[0])
+        )
+        
+        self.table.setRowCount(len(sorted_countries))
+        for row, (country, count) in enumerate(sorted_countries):
+            country_item = QTableWidgetItem(country)
+            count_item = QTableWidgetItem(str(count))
+            count_item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            self.table.setItem(row, 0, country_item)
+            self.table.setItem(row, 1, count_item)
+        
+        layout.addWidget(self.table)
+        
+        # Close button
+        button_layout = QHBoxLayout()
+        close_button = QPushButton("Close")
+        close_button.clicked.connect(self.accept)
+        button_layout.addStretch()
+        button_layout.addWidget(close_button)
+        
+        layout.addLayout(button_layout)
+        self.setLayout(layout)
+
+
 class MainWindow(QMainWindow):
     """Main application window."""
     
@@ -243,6 +311,7 @@ class MainWindow(QMainWindow):
     save_database_requested = Signal()
     new_database_requested = Signal()
     country_filter_changed = Signal(str)  # Emits selected country
+    statistics_requested = Signal()
     
     def __init__(self):
         super().__init__()
@@ -338,6 +407,13 @@ class MainWindow(QMainWindow):
         exit_action = QAction("Exit", self)
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
+        
+        # Statistics menu
+        statistics_menu = menu_bar.addMenu("Statistics")
+        
+        view_statistics_action = QAction("View Statistics", self)
+        view_statistics_action.triggered.connect(self.statistics_requested.emit)
+        statistics_menu.addAction(view_statistics_action)
     
     def on_selection_changed(self):
         """Handle stamp selection change."""

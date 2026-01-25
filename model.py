@@ -171,3 +171,25 @@ class StampDatabase:
         self.stamps = []
         self.file_path = None
         self._modified = False
+    
+    def get_country_statistics(self) -> dict:
+        """
+        Get statistics on stamp counts by country.
+        
+        Returns:
+            Dictionary mapping country names to their stamp counts.
+        """
+        country_counts = {}
+        for stamp in self.stamps:
+            country = stamp.country if stamp.country and stamp.country.strip() else "Unknown"
+            country_counts[country] = country_counts.get(country, 0) + 1
+        return country_counts
+    
+    def get_total_count(self) -> int:
+        """
+        Get total number of stamps in the database.
+        
+        Returns:
+            Total stamp count.
+        """
+        return len(self.stamps)
