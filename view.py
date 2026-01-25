@@ -386,7 +386,13 @@ class MainWindow(QMainWindow):
             self.stamp_list.addItem(item)
     
     def update_country_filter(self, countries: List[str]):
-        """Update the country filter dropdown with available countries."""
+        """
+        Update the country filter dropdown with available countries.
+        
+        Args:
+            countries: List of country names to add to the filter.
+                      Empty strings and None values are filtered out.
+        """
         current_selection = self.country_filter.currentText()
         self.country_filter.clear()
         
@@ -395,7 +401,7 @@ class MainWindow(QMainWindow):
         
         # Add unique countries
         for country in sorted(countries):
-            if country:  # Only add non-empty countries
+            if country and country.strip():  # Only add non-empty countries
                 self.country_filter.addItem(country)
         
         # Restore previous selection if it still exists

@@ -213,7 +213,11 @@ class StampController:
         stamps = self.database.get_all_stamps()
         
         # Update country filter options
-        countries = set(stamp.country for stamp in stamps if stamp.country)
+        # Extract non-empty country values
+        countries = set(
+            stamp.country for stamp in stamps 
+            if stamp.country is not None and stamp.country.strip()
+        )
         self.view.update_country_filter(list(countries))
         
         # Apply current filter
@@ -229,13 +233,23 @@ class StampController:
         self.view.setWindowTitle(title)
     
     def get_filtered_stamps(self) -> List[Stamp]:
-        """Get stamps filtered by current country filter."""
+        """
+        Get stamps filtered by current country filter.
+        
+        Returns:
+            List of stamps matching the current country filter.
+            Returns all stamps if filter is "All Countries".
+        """
         stamps = self.database.get_all_stamps()
         
         if self.current_filter == "All Countries":
             return stamps
         
-        return [stamp for stamp in stamps if stamp.country == self.current_filter]
+        # Filter stamps by country, handling None values
+        return [
+            stamp for stamp in stamps 
+            if stamp.country is not None and stamp.country == self.current_filter
+        ]
     
     def on_country_filter_changed(self, country: str):
         """Handle country filter change."""
