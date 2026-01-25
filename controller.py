@@ -3,7 +3,7 @@ Controller layer for the stamp collection application.
 Coordinates between Model and View following MVC pattern.
 """
 from PySide6.QtWidgets import QFileDialog, QMessageBox
-from typing import Optional
+from typing import Optional, List
 
 from model import StampDatabase, Stamp
 from view import MainWindow, StampDialog
@@ -15,6 +15,7 @@ class StampController:
     def __init__(self):
         self.database = StampDatabase()
         self.view = MainWindow()
+        self.current_filter = "All Countries"
         
         # Connect signals from view to controller methods
         self.view.load_database_requested.connect(self.load_database)
@@ -24,6 +25,7 @@ class StampController:
         self.view.edit_stamp_requested.connect(self.edit_stamp)
         self.view.delete_stamp_requested.connect(self.delete_stamp)
         self.view.stamp_selected.connect(self.show_stamp_details)
+        self.view.country_filter_changed.connect(self.on_country_filter_changed)
     
     def run(self):
         """Start the application."""
@@ -209,7 +211,18 @@ class StampController:
     def refresh_view(self):
         """Refresh the view with current database state."""
         stamps = self.database.get_all_stamps()
-        self.view.update_stamp_list(stamps)
+        
+        # Update country filter options
+        # Extract non-empty country values
+        countries = set(
+            stamp.country for stamp in stamps 
+            if stamp.country is not None and stamp.country.strip()
+        )
+        self.view.update_country_filter(list(countries))
+        
+        # Apply current filter
+        filtered_stamps = self.get_filtered_stamps()
+        self.view.update_stamp_list(filtered_stamps)
         
         # Update window title to show database status
         title = "Stamp Collection Manager"
@@ -218,3 +231,34 @@ class StampController:
         if self.database.is_modified():
             title += " *"
         self.view.setWindowTitle(title)
+    
+    def get_filtered_stamps(self) -> List[Stamp]:
+        """
+        Get stamps filtered by current country filter.
+        
+        Returns:
+            List of stamps matching the current country filter.
+            Returns all stamps if filter is "All Countries".
+        """
+        stamps = self.database.get_all_stamps()
+        
+        if self.current_filter == "All Countries":
+            return stamps
+        
+        # Filter stamps by country, handling None values
+        return [
+            stamp for stamp in stamps 
+            if stamp.country is not None and stamp.country == self.current_filter
+        ]
+    
+    def on_country_filter_changed(self, country: str):
+        """Handle country filter change."""
+        self.current_filter = country
+        filtered_stamps = self.get_filtered_stamps()
+        self.view.update_stamp_list(filtered_stamps)
+        
+        # Update status message
+        if country == "All Countries":
+            self.view.set_status_message(f"Showing all stamps ({len(filtered_stamps)} total)")
+        else:
+            self.view.set_status_message(f"Filtered by {country} ({len(filtered_stamps)} stamps)")

@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
     QListWidget, QLabel, QLineEdit, QTextEdit, QFileDialog,
     QMessageBox, QDialog, QFormLayout, QListWidgetItem, QScrollArea,
-    QSplitter, QGroupBox
+    QSplitter, QGroupBox, QComboBox
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap, QAction
@@ -242,6 +242,7 @@ class MainWindow(QMainWindow):
     load_database_requested = Signal()
     save_database_requested = Signal()
     new_database_requested = Signal()
+    country_filter_changed = Signal(str)  # Emits selected country
     
     def __init__(self):
         super().__init__()
@@ -268,6 +269,15 @@ class MainWindow(QMainWindow):
         # Left panel - List of stamps
         left_panel = QWidget()
         left_layout = QVBoxLayout()
+        
+        # Filter section
+        filter_layout = QHBoxLayout()
+        filter_label = QLabel("Filter by Country:")
+        self.country_filter = QComboBox()
+        self.country_filter.currentTextChanged.connect(self.on_filter_changed)
+        filter_layout.addWidget(filter_label)
+        filter_layout.addWidget(self.country_filter, 1)
+        left_layout.addLayout(filter_layout)
         
         # Buttons
         button_layout = QHBoxLayout()
@@ -374,6 +384,34 @@ class MainWindow(QMainWindow):
             item = QListWidgetItem(display_text)
             item.setData(Qt.UserRole, stamp.unique_id)
             self.stamp_list.addItem(item)
+    
+    def update_country_filter(self, countries: List[str]):
+        """
+        Update the country filter dropdown with available countries.
+        
+        Args:
+            countries: List of country names to add to the filter.
+                      Empty strings and None values are filtered out.
+        """
+        current_selection = self.country_filter.currentText()
+        self.country_filter.clear()
+        
+        # Add "All Countries" as first option
+        self.country_filter.addItem("All Countries")
+        
+        # Add unique countries
+        for country in sorted(countries):
+            if country and country.strip():  # Only add non-empty countries
+                self.country_filter.addItem(country)
+        
+        # Restore previous selection if it still exists
+        index = self.country_filter.findText(current_selection)
+        if index >= 0:
+            self.country_filter.setCurrentIndex(index)
+    
+    def on_filter_changed(self, country: str):
+        """Handle country filter change."""
+        self.country_filter_changed.emit(country)
     
     def show_stamp_details(self, stamp: Stamp):
         """Show stamp details in the details panel."""

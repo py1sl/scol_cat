@@ -6,6 +6,7 @@ A digital record of stamp collection with a PySide6 GUI interface.
 
 - **Load and Save Database**: Manage your stamp collection using JSON files
 - **View Entries**: Browse through your stamp collection with an intuitive list view
+- **Filter by Country**: Filter the stamp list by country of origin
 - **Add New Entries**: Add new stamps with detailed information
 - **Edit Entries**: Update existing stamp information
 - **Delete Entries**: Remove stamps from your collection
@@ -48,11 +49,12 @@ python main.py
 1. **Create a New Database**: File → New Database
 2. **Load Existing Database**: File → Load Database (select a .json file)
    - Try loading the included `example_stamps.json` to see sample data
-3. **Add a Stamp**: Click "Add Stamp" button and fill in the details
-4. **View Stamp Details**: Click on a stamp in the list to view full details
-5. **Edit a Stamp**: Select a stamp and click "Edit Stamp"
-6. **Delete a Stamp**: Select a stamp and click "Delete Stamp"
-7. **Save Your Work**: File → Save Database
+3. **Filter Stamps**: Use the "Filter by Country" dropdown to view stamps from a specific country
+4. **Add a Stamp**: Click "Add Stamp" button and fill in the details
+5. **View Stamp Details**: Click on a stamp in the list to view full details
+6. **Edit a Stamp**: Select a stamp and click "Edit Stamp"
+7. **Delete a Stamp**: Select a stamp and click "Delete Stamp"
+8. **Save Your Work**: File → Save Database
 
 ## Database Format
 
