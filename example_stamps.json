@@ -1,0 +1,28 @@
+{
+  "stamps": [
+    {
+      "unique_id": "example-001",
+      "name": "Penny Black",
+      "country": "United Kingdom",
+      "image_path": "",
+      "dates": "1840",
+      "comments": "The world's first adhesive postage stamp used in a public postal system",
+      "catalogue_ids": "Stanley Gibbons: 1, Scott: 1",
+      "collection_number": "001"
+    },
+    {
+      "unique_id": "example-002",
+      "name": "Blue Mauritius",
+      "country": "Mauritius",
+      "image_path": "",
+      "dates": "1847",
+      "comments": "One of the world's most famous rare stamps",
+      "catalogue_ids": "Stanley Gibbons: 3",
+      "collection_number": "002"
+    }
+  ],
+  "metadata": {
+    "version": "1.0",
+    "last_modified": "2026-01-25T09:00:00.000000"
+  }
+}
