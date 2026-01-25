@@ -275,18 +275,15 @@ class TestStampDatabase:
             data = json.load(f)
         assert len(data['stamps']) == 2
     
-    def test_load_non_existent_file(self, db):
+    def test_load_non_existent_file(self, db, tmp_path):
         """Test loading a non-existent file creates empty database."""
-        non_existent_path = "/tmp/test_nonexistent_file_12345.json"
-        # Make sure it doesn't exist
-        if os.path.exists(non_existent_path):
-            os.remove(non_existent_path)
+        non_existent_path = tmp_path / "test_nonexistent_file.json"
         
-        result = db.load(non_existent_path)
+        result = db.load(str(non_existent_path))
         
         assert result is True
         assert len(db.stamps) == 0
-        assert db.file_path == non_existent_path
+        assert db.file_path == str(non_existent_path)
         assert not db.is_modified()
     
     def test_load_existing_file(self, db, temp_json_file, sample_stamps):

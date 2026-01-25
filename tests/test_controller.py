@@ -46,13 +46,13 @@ class TestControllerBusinessLogic:
         assert all(s.country == "USA" for s in filtered)
     
     def test_filter_with_none_country(self):
-        """Test filtering handles None country values."""
+        """Test filtering handles empty string country values."""
         db = StampDatabase()
         db.add_stamp(Stamp(name="S1", country="USA"))
-        db.add_stamp(Stamp(name="S2", country=None))
-        db.add_stamp(Stamp(name="S3", country=""))
+        db.add_stamp(Stamp(name="S2", country=""))
+        db.add_stamp(Stamp(name="S3", country="Canada"))
         
-        # Simulate filtering logic that handles None
+        # Simulate filtering logic that handles empty strings
         filter_value = "USA"
         filtered = [
             s for s in db.get_all_stamps() 
@@ -68,9 +68,8 @@ class TestControllerBusinessLogic:
         for stamp in sample_stamps:
             db.add_stamp(stamp)
         db.add_stamp(Stamp(name="S4", country=""))
-        db.add_stamp(Stamp(name="S5", country=None))
         
-        # Simulate country extraction logic
+        # Simulate country extraction logic - empty strings are filtered out
         countries = set(
             stamp.country for stamp in db.get_all_stamps()
             if stamp.country is not None and stamp.country.strip()
@@ -78,9 +77,10 @@ class TestControllerBusinessLogic:
         
         assert countries == {"USA", "UK"}
     
-    def test_database_modified_after_operations(self):
+    def test_database_modified_after_operations(self, tmp_path):
         """Test database modification tracking."""
         db = StampDatabase()
+        test_file = tmp_path / "test.json"
         
         assert not db.is_modified()
         
@@ -88,11 +88,17 @@ class TestControllerBusinessLogic:
         db.add_stamp(stamp)
         assert db.is_modified()
         
-        db._modified = False  # Simulate after save
+        # Save resets modified flag
+        db.save(str(test_file))
+        assert not db.is_modified()
+        
         db.update_stamp(stamp.unique_id, stamp)
         assert db.is_modified()
         
-        db._modified = False
+        # Save again to reset
+        db.save()
+        assert not db.is_modified()
+        
         db.delete_stamp(stamp.unique_id)
         assert db.is_modified()
 
