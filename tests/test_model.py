@@ -3,7 +3,71 @@ import json
 import os
 import tempfile
 import pytest
-from model import Stamp, StampDatabase
+from model import Stamp, StampDatabase, parse_date_field, get_decade_from_year
+
+
+class TestDateParsing:
+    """Tests for date parsing functions."""
+    
+    def test_parse_single_year(self):
+        """Test parsing a single year."""
+        assert parse_date_field("1840") == 1840
+        assert parse_date_field("1999") == 1999
+        assert parse_date_field("2024") == 2024
+    
+    def test_parse_year_range_with_dash(self):
+        """Test parsing year ranges with dash."""
+        assert parse_date_field("1840-1850") == 1845
+        assert parse_date_field("1990-2000") == 1995
+        assert parse_date_field("2010-2020") == 2015
+        # Test with spaces
+        assert parse_date_field("1840 - 1850") == 1845
+        assert parse_date_field("1840- 1850") == 1845
+        assert parse_date_field("1840 -1850") == 1845
+    
+    def test_parse_year_range_with_to(self):
+        """Test parsing year ranges with 'to'."""
+        assert parse_date_field("1840 to 1850") == 1845
+        assert parse_date_field("1990 to 2000") == 1995
+        # Test case insensitivity
+        assert parse_date_field("1840 TO 1850") == 1845
+        assert parse_date_field("1840 To 1850") == 1845
+    
+    def test_parse_circa_dates(self):
+        """Test parsing circa dates."""
+        assert parse_date_field("circa 1840") == 1840
+        assert parse_date_field("c. 1840") == 1840
+        assert parse_date_field("ca. 1840") == 1840
+        # Test case insensitivity
+        assert parse_date_field("CIRCA 1840") == 1840
+        assert parse_date_field("Circa 1840") == 1840
+        assert parse_date_field("C. 1840") == 1840
+    
+    def test_parse_invalid_dates(self):
+        """Test parsing invalid or unparseable dates."""
+        assert parse_date_field("") is None
+        assert parse_date_field("   ") is None
+        assert parse_date_field("invalid") is None
+        assert parse_date_field("12345") is None
+        assert parse_date_field("abc-def") is None
+        assert parse_date_field(None) is None
+    
+    def test_parse_edge_cases(self):
+        """Test edge cases for date parsing."""
+        # Leading/trailing whitespace
+        assert parse_date_field("  1840  ") == 1840
+        assert parse_date_field("  1840-1850  ") == 1845
+        assert parse_date_field("  circa 1840  ") == 1840
+    
+    def test_get_decade_from_year(self):
+        """Test getting decade from year."""
+        assert get_decade_from_year(1840) == 1840
+        assert get_decade_from_year(1845) == 1840
+        assert get_decade_from_year(1849) == 1840
+        assert get_decade_from_year(1850) == 1850
+        assert get_decade_from_year(1999) == 1990
+        assert get_decade_from_year(2000) == 2000
+        assert get_decade_from_year(2024) == 2020
 
 
 class TestStamp:
@@ -401,3 +465,62 @@ class TestStampDatabase:
         
         db.delete_stamp("stamp-001")
         assert db.get_total_count() == 1
+    
+    def test_get_decade_statistics_empty(self, db):
+        """Test getting decade statistics from empty database."""
+        stats = db.get_decade_statistics()
+        assert stats == {}
+    
+    def test_get_decade_statistics(self, db):
+        """Test getting decade statistics."""
+        stamps = [
+            Stamp(name="Stamp 1", dates="1840"),
+            Stamp(name="Stamp 2", dates="1845"),
+            Stamp(name="Stamp 3", dates="1850"),
+            Stamp(name="Stamp 4", dates="1990-2000"),  # Mid-year 1995
+            Stamp(name="Stamp 5", dates="circa 1845"),
+            Stamp(name="Stamp 6", dates="2020 to 2024"),  # Mid-year 2022
+        ]
+        for stamp in stamps:
+            db.add_stamp(stamp)
+        
+        stats = db.get_decade_statistics()
+        
+        assert stats["1840s"] == 3  # 1840, 1845, circa 1845
+        assert stats["1850s"] == 1  # 1850
+        assert stats["1990s"] == 1  # 1995 (mid-year of 1990-2000)
+        assert stats["2020s"] == 1  # 2022 (mid-year of 2020-2024)
+    
+    def test_get_decade_statistics_with_invalid_dates(self, db):
+        """Test decade statistics with invalid or unparseable dates."""
+        stamps = [
+            Stamp(name="Stamp 1", dates="1840"),
+            Stamp(name="Stamp 2", dates=""),
+            Stamp(name="Stamp 3", dates="invalid date"),
+            Stamp(name="Stamp 4", dates="1845"),
+        ]
+        for stamp in stamps:
+            db.add_stamp(stamp)
+        
+        stats = db.get_decade_statistics()
+        
+        assert stats["1840s"] == 2
+        assert stats["Unknown"] == 2
+    
+    def test_get_decade_statistics_various_formats(self, db):
+        """Test decade statistics with various date formats."""
+        stamps = [
+            Stamp(name="Single year", dates="1920"),
+            Stamp(name="Range with dash", dates="1920-1930"),  # 1925
+            Stamp(name="Range with to", dates="1920 to 1930"),  # 1925
+            Stamp(name="Circa", dates="circa 1922"),
+            Stamp(name="Another single", dates="1925"),
+        ]
+        for stamp in stamps:
+            db.add_stamp(stamp)
+        
+        stats = db.get_decade_statistics()
+        
+        # All should be in 1920s
+        assert stats["1920s"] == 5
+        assert len(stats) == 1  # Only one decade

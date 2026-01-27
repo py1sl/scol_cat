@@ -4,10 +4,80 @@ Handles data management and persistence using JSON.
 """
 import json
 import os
+import re
 from dataclasses import dataclass, field, asdict
-from typing import List, Optional
+from typing import List, Optional, Union
 from datetime import datetime
 import uuid
+
+
+def parse_date_field(date_str: str) -> Optional[int]:
+    """
+    Parse a date field and return a representative year.
+    
+    Handles:
+    - Single year: "1840" -> 1840
+    - Year range with dash: "1840-1850" -> 1845 (mid-year)
+    - Year range with 'to': "1840 to 1850" -> 1845 (mid-year)
+    - Circa dates: "circa 1840" -> 1840
+    
+    Args:
+        date_str: The date string to parse
+        
+    Returns:
+        The representative year, or None if parsing fails
+    """
+    if not date_str or not isinstance(date_str, str):
+        return None
+    
+    # Clean up the string
+    date_str = date_str.strip()
+    if not date_str:
+        return None
+    
+    # Handle circa dates - remove "circa", "c.", "ca." (case insensitive)
+    circa_pattern = r'^(circa|c\.|ca\.)\s*'
+    date_str = re.sub(circa_pattern, '', date_str, flags=re.IGNORECASE).strip()
+    
+    # Try to match year range with dash (e.g., "1840-1850")
+    range_dash_pattern = r'^(\d{4})\s*-\s*(\d{4})$'
+    match = re.match(range_dash_pattern, date_str)
+    if match:
+        start_year = int(match.group(1))
+        end_year = int(match.group(2))
+        # Return mid-year
+        return (start_year + end_year) // 2
+    
+    # Try to match year range with 'to' (e.g., "1840 to 1850")
+    range_to_pattern = r'^(\d{4})\s+to\s+(\d{4})$'
+    match = re.match(range_to_pattern, date_str, flags=re.IGNORECASE)
+    if match:
+        start_year = int(match.group(1))
+        end_year = int(match.group(2))
+        # Return mid-year
+        return (start_year + end_year) // 2
+    
+    # Try to match single year (e.g., "1840")
+    single_year_pattern = r'^(\d{4})$'
+    match = re.match(single_year_pattern, date_str)
+    if match:
+        return int(match.group(1))
+    
+    # Could not parse
+    return None
+
+
+def get_decade_from_year(year: int) -> int:
+    """
+    Get the decade for a given year.
+    
+    Args:
+        year: The year
+        
+    Returns:
+        The decade (e.g., 1840 for year 1845)
+    """
+    return (year // 10) * 10
 
 
 @dataclass
@@ -193,3 +263,25 @@ class StampDatabase:
             Total stamp count.
         """
         return len(self.stamps)
+    
+    def get_decade_statistics(self) -> dict:
+        """
+        Get statistics on stamp counts by decade.
+        
+        Parses the dates field of each stamp and groups stamps by decade.
+        For year ranges, the mid-year is used to determine the decade.
+        
+        Returns:
+            Dictionary mapping decade (e.g., "1840s") to their stamp counts.
+            Stamps with unparseable dates are grouped under "Unknown".
+        """
+        decade_counts = {}
+        for stamp in self.stamps:
+            year = parse_date_field(stamp.dates)
+            if year is not None:
+                decade = get_decade_from_year(year)
+                decade_label = f"{decade}s"
+                decade_counts[decade_label] = decade_counts.get(decade_label, 0) + 1
+            else:
+                decade_counts["Unknown"] = decade_counts.get("Unknown", 0) + 1
+        return decade_counts
