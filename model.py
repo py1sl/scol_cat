@@ -268,7 +268,7 @@ class StampDatabase:
         """
         Get statistics on stamp counts by decade.
         
-        parses the dates field of each stamp and groups stamps by decade.
+        Parses the dates field of each stamp and groups stamps by decade.
         For year ranges, the mid-year is used to determine the decade.
         
         Returns:
