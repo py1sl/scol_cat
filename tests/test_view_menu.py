@@ -2,22 +2,15 @@
 Test the View menu Full Details toggle functionality.
 """
 import pytest
-from unittest.mock import MagicMock, patch
-import sys
 import os
-
-# Mock Qt modules before import
-sys.modules['PySide6'] = MagicMock()
-sys.modules['PySide6.QtWidgets'] = MagicMock()
-sys.modules['PySide6.QtCore'] = MagicMock()
-sys.modules['PySide6.QtGui'] = MagicMock()
 
 
 def test_stamp_details_widget_has_full_details_mode():
     """Test that StampDetailsWidget has the full details mode methods."""
-    # Since we can't actually import due to Qt dependencies, we'll verify
+    # Since we can't actually import due to Qt dependencies in CI, we'll verify
     # the code structure by reading the file
-    with open('/home/runner/work/scol_cat/scol_cat/view.py', 'r') as f:
+    view_file_path = os.path.join(os.path.dirname(__file__), '..', 'view.py')
+    with open(view_file_path, 'r') as f:
         content = f.read()
     
     # Check for key additions
@@ -30,7 +23,8 @@ def test_stamp_details_widget_has_full_details_mode():
 
 def test_main_window_has_view_menu():
     """Test that MainWindow has the View menu."""
-    with open('/home/runner/work/scol_cat/scol_cat/view.py', 'r') as f:
+    view_file_path = os.path.join(os.path.dirname(__file__), '..', 'view.py')
+    with open(view_file_path, 'r') as f:
         content = f.read()
     
     # Check for View menu addition
@@ -44,7 +38,8 @@ def test_main_window_has_view_menu():
 
 def test_default_full_details_is_off():
     """Test that Full Details defaults to off."""
-    with open('/home/runner/work/scol_cat/scol_cat/view.py', 'r') as f:
+    view_file_path = os.path.join(os.path.dirname(__file__), '..', 'view.py')
+    with open(view_file_path, 'r') as f:
         content = f.read()
     
     # Default state should be False/off

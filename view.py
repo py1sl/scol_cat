@@ -175,7 +175,6 @@ class StampDetailsWidget(QWidget):
         
         self.unique_id_label = QLabel()
         self.unique_id_row_label = QLabel("Unique ID:")
-        self.unique_id_row_index = self.details_layout.rowCount()
         self.details_layout.addRow(self.unique_id_row_label, self.unique_id_label)
         
         self.comments_label = QLabel()
