@@ -132,6 +132,7 @@ class StampDetailsWidget(QWidget):
     
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.show_unique_id = False  # Default: hide unique ID
         self.setup_ui()
     
     def setup_ui(self):
@@ -155,31 +156,32 @@ class StampDetailsWidget(QWidget):
         
         # Details group
         details_group = QGroupBox("Stamp Details")
-        details_layout = QFormLayout()
+        self.details_layout = QFormLayout()
         
         self.name_label = QLabel()
-        details_layout.addRow("Name:", self.name_label)
+        self.details_layout.addRow("Name:", self.name_label)
         
         self.country_label = QLabel()
-        details_layout.addRow("Country:", self.country_label)
+        self.details_layout.addRow("Country:", self.country_label)
         
         self.dates_label = QLabel()
-        details_layout.addRow("Dates:", self.dates_label)
+        self.details_layout.addRow("Dates:", self.dates_label)
         
         self.collection_number_label = QLabel()
-        details_layout.addRow("Collection Number:", self.collection_number_label)
+        self.details_layout.addRow("Collection Number:", self.collection_number_label)
         
         self.catalogue_ids_label = QLabel()
-        details_layout.addRow("Catalogue IDs:", self.catalogue_ids_label)
+        self.details_layout.addRow("Catalogue IDs:", self.catalogue_ids_label)
         
         self.unique_id_label = QLabel()
-        details_layout.addRow("Unique ID:", self.unique_id_label)
+        self.unique_id_row_label = QLabel("Unique ID:")
+        self.details_layout.addRow(self.unique_id_row_label, self.unique_id_label)
         
         self.comments_label = QLabel()
         self.comments_label.setWordWrap(True)
-        details_layout.addRow("Comments:", self.comments_label)
+        self.details_layout.addRow("Comments:", self.comments_label)
         
-        details_group.setLayout(details_layout)
+        details_group.setLayout(self.details_layout)
         self.content_layout.addWidget(details_group)
         
         self.content_layout.addStretch()
@@ -191,6 +193,19 @@ class StampDetailsWidget(QWidget):
         
         # Initially show a message
         self.clear()
+        
+        # Apply initial visibility state
+        self.update_unique_id_visibility()
+    
+    def set_full_details_mode(self, enabled: bool):
+        """Set whether to show full details (including unique ID)."""
+        self.show_unique_id = enabled
+        self.update_unique_id_visibility()
+    
+    def update_unique_id_visibility(self):
+        """Update the visibility of the unique ID row."""
+        self.unique_id_row_label.setVisible(self.show_unique_id)
+        self.unique_id_label.setVisible(self.show_unique_id)
     
     def display_stamp(self, stamp: Stamp):
         """Display stamp information."""
@@ -217,6 +232,9 @@ class StampDetailsWidget(QWidget):
                 self.image_label.setText("Unable to load image")
         else:
             self.image_label.setText("No image available")
+        
+        # Ensure visibility state is maintained after updating stamp details
+        self.update_unique_id_visibility()
     
     def clear(self):
         """Clear the details display."""
@@ -408,6 +426,15 @@ class MainWindow(QMainWindow):
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
         
+        # View menu
+        view_menu = menu_bar.addMenu("View")
+        
+        self.full_details_action = QAction("Full Details", self)
+        self.full_details_action.setCheckable(True)
+        self.full_details_action.setChecked(False)  # Default: off
+        self.full_details_action.triggered.connect(self.on_full_details_toggled)
+        view_menu.addAction(self.full_details_action)
+        
         # Statistics menu
         statistics_menu = menu_bar.addMenu("Statistics")
         
@@ -488,6 +515,10 @@ class MainWindow(QMainWindow):
     def on_filter_changed(self, country: str):
         """Handle country filter change."""
         self.country_filter_changed.emit(country)
+    
+    def on_full_details_toggled(self, checked: bool):
+        """Handle full details toggle."""
+        self.details_widget.set_full_details_mode(checked)
     
     def show_stamp_details(self, stamp: Stamp):
         """Show stamp details in the details panel."""
