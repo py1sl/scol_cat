@@ -232,6 +232,9 @@ class StampDetailsWidget(QWidget):
                 self.image_label.setText("Unable to load image")
         else:
             self.image_label.setText("No image available")
+        
+        # Ensure visibility state is maintained after updating stamp details
+        self.update_unique_id_visibility()
     
     def clear(self):
         """Clear the details display."""
