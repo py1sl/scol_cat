@@ -60,12 +60,11 @@ See `stamps_by_decade_mockup.png` for a visual representation of the implemented
 
 - Leveraged existing `get_decade_statistics()` method in model.py
 - Follows the same pattern as the existing "View Statistics" dialog
-- Uses matplotlib's Qt5Agg backend for seamless PySide6 integration
+- Uses matplotlib's QtAgg backend for seamless PySide6 (Qt6) integration
 - Bar chart includes:
   - X-axis: Decades
   - Y-axis: Number of Stamps
   - Rotated labels for readability
-  - Grid lines for easier value reading
   - Value labels on each bar
 
 ## Code Quality
