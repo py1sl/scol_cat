@@ -116,9 +116,9 @@ def test_matplotlib_imports_in_view():
     with open(view_file_path, 'r') as f:
         content = f.read()
     
-    # Check for matplotlib imports
+    # Check for matplotlib imports (using QtAgg backend for Qt5/Qt6 compatibility)
     assert 'import matplotlib' in content
-    assert 'from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas' in content
+    assert 'from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas' in content
     assert 'from matplotlib.figure import Figure' in content
 
 

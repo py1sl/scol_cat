@@ -13,8 +13,8 @@ from PySide6.QtGui import QPixmap, QAction
 from typing import Optional, List
 import os
 import matplotlib
-matplotlib.use('Qt5Agg')  # Use Qt backend for matplotlib
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+matplotlib.use('QtAgg')  # Use Qt backend for matplotlib (Qt5/Qt6 compatible)
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
 from model import Stamp
