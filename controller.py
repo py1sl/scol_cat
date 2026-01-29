@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QFileDialog, QMessageBox
 from typing import Optional, List
 
 from model import StampDatabase, Stamp
-from view import MainWindow, StampDialog, StatisticsDialog
+from view import MainWindow, StampDialog, StatisticsDialog, DecadeStatisticsDialog
 
 
 class StampController:
@@ -27,6 +27,7 @@ class StampController:
         self.view.stamp_selected.connect(self.show_stamp_details)
         self.view.country_filter_changed.connect(self.on_country_filter_changed)
         self.view.statistics_requested.connect(self.show_statistics)
+        self.view.decade_statistics_requested.connect(self.show_decade_statistics)
     
     def run(self):
         """Start the application."""
@@ -270,4 +271,11 @@ class StampController:
         total_count = self.database.get_total_count()
         
         dialog = StatisticsDialog(self.view, country_stats, total_count)
+        dialog.exec()
+    
+    def show_decade_statistics(self):
+        """Display decade statistics dialog."""
+        decade_stats = self.database.get_decade_statistics()
+        
+        dialog = DecadeStatisticsDialog(self.view, decade_stats)
         dialog.exec()

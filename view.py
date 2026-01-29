@@ -12,6 +12,10 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap, QAction
 from typing import Optional, List
 import os
+import matplotlib
+matplotlib.use('QtAgg')  # Use Qt backend for matplotlib (Qt5/Qt6 compatible)
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
 
 from model import Stamp
 
@@ -317,6 +321,108 @@ class StatisticsDialog(QDialog):
         self.setLayout(layout)
 
 
+class DecadeStatisticsDialog(QDialog):
+    """Dialog for displaying stamps by decade statistics with a bar chart."""
+    
+    def __init__(self, parent=None, decade_stats: dict = None):
+        super().__init__(parent)
+        self.decade_stats = decade_stats or {}
+        self.setup_ui()
+    
+    def setup_ui(self):
+        """Set up the decade statistics dialog UI."""
+        self.setWindowTitle("Stamps by Decade")
+        self.setMinimumSize(700, 600)
+        
+        layout = QVBoxLayout()
+        
+        # Decade statistics table
+        table_label = QLabel("Stamps by Decade:")
+        layout.addWidget(table_label)
+        
+        self.table = QTableWidget()
+        self.table.setColumnCount(2)
+        self.table.setHorizontalHeaderLabels(["Decade", "Number of Stamps"])
+        self.table.horizontalHeader().setStretchLastSection(True)
+        self.table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.table.setEditTriggers(QTableWidget.NoEditTriggers)
+        self.table.setSelectionBehavior(QTableWidget.SelectRows)
+        
+        # Sort decades - separate "Unknown" from numbered decades
+        # Numbered decades are sorted numerically
+        def sort_key(item):
+            decade, count = item
+            if decade == "Unknown":
+                return (1, "")  # Put Unknown at the end
+            else:
+                # Extract the numeric part (e.g., "1840s" -> 1840)
+                try:
+                    numeric_value = int(decade[:-1]) if decade.endswith('s') else int(decade)
+                    return (0, numeric_value)
+                except ValueError:
+                    return (1, decade)  # Other non-numeric values at the end
+        
+        sorted_decades = sorted(
+            self.decade_stats.items(),
+            key=sort_key
+        )
+        
+        self.table.setRowCount(len(sorted_decades))
+        for row, (decade, count) in enumerate(sorted_decades):
+            decade_item = QTableWidgetItem(decade)
+            count_item = QTableWidgetItem(str(count))
+            count_item.setTextAlignment(Qt.AlignRight | Qt.AlignVCenter)
+            self.table.setItem(row, 0, decade_item)
+            self.table.setItem(row, 1, count_item)
+        
+        layout.addWidget(self.table)
+        
+        # Bar chart
+        chart_label = QLabel("Bar Chart:")
+        layout.addWidget(chart_label)
+        
+        # Create matplotlib figure and canvas
+        self.figure = Figure(figsize=(8, 4))
+        self.canvas = FigureCanvas(self.figure)
+        
+        # Plot the bar chart
+        ax = self.figure.add_subplot(111)
+        
+        if sorted_decades:
+            decades = [d[0] for d in sorted_decades]
+            counts = [d[1] for d in sorted_decades]
+            
+            bars = ax.bar(decades, counts, color='steelblue', edgecolor='black')
+            ax.set_xlabel('Decade')
+            ax.set_ylabel('Number of Stamps')
+            ax.set_title('Stamps by Decade')
+            
+            # Rotate x-axis labels for better readability
+            ax.tick_params(axis='x', rotation=45)
+            
+            # Add value labels on top of bars
+            for bar in bars:
+                height = bar.get_height()
+                ax.text(bar.get_x() + bar.get_width()/2., height,
+                       f'{int(height)}',
+                       ha='center', va='bottom', fontsize=9)
+            
+            self.figure.tight_layout()
+        
+        layout.addWidget(self.canvas)
+        
+        # Close button
+        button_layout = QHBoxLayout()
+        close_button = QPushButton("Close")
+        close_button.clicked.connect(self.accept)
+        button_layout.addStretch()
+        button_layout.addWidget(close_button)
+        
+        layout.addLayout(button_layout)
+        self.setLayout(layout)
+
+
+
 class MainWindow(QMainWindow):
     """Main application window."""
     
@@ -330,6 +436,7 @@ class MainWindow(QMainWindow):
     new_database_requested = Signal()
     country_filter_changed = Signal(str)  # Emits selected country
     statistics_requested = Signal()
+    decade_statistics_requested = Signal()
     
     def __init__(self):
         super().__init__()
@@ -441,6 +548,10 @@ class MainWindow(QMainWindow):
         view_statistics_action = QAction("View Statistics", self)
         view_statistics_action.triggered.connect(self.statistics_requested.emit)
         statistics_menu.addAction(view_statistics_action)
+        
+        stamps_by_decade_action = QAction("Stamps by Decade", self)
+        stamps_by_decade_action.triggered.connect(self.decade_statistics_requested.emit)
+        statistics_menu.addAction(stamps_by_decade_action)
     
     def on_selection_changed(self):
         """Handle stamp selection change."""
