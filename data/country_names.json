@@ -1,0 +1,362 @@
+[
+  {
+    "current_name": "Germany",
+    "previous_name": "West Germany",
+    "year_range": "1949-1990"
+  },
+  {
+    "current_name": "Germany",
+    "previous_name": "East Germany",
+    "year_range": "1949-1990"
+  },
+  {
+    "current_name": "Germany",
+    "previous_name": "German Empire",
+    "year_range": "1871-1918"
+  },
+  {
+    "current_name": "Germany",
+    "previous_name": "North German Confederation",
+    "year_range": "1867-1871"
+  },
+  {
+    "current_name": "Germany",
+    "previous_name": "Prussia",
+    "year_range": "1840-1866"
+  },
+  {
+    "current_name": "Czech Republic",
+    "previous_name": "Czechoslovakia",
+    "year_range": "1918-1992"
+  },
+  {
+    "current_name": "Slovakia",
+    "previous_name": "Czechoslovakia",
+    "year_range": "1918-1992"
+  },
+  {
+    "current_name": "Russia",
+    "previous_name": "Soviet Union",
+    "year_range": "1922-1991"
+  },
+  {
+    "current_name": "Ukraine",
+    "previous_name": "Soviet Union",
+    "year_range": "1922-1991"
+  },
+  {
+    "current_name": "Belarus",
+    "previous_name": "Soviet Union",
+    "year_range": "1922-1991"
+  },
+  {
+    "current_name": "Kazakhstan",
+    "previous_name": "Soviet Union",
+    "year_range": "1922-1991"
+  },
+  {
+    "current_name": "Georgia",
+    "previous_name": "Soviet Union",
+    "year_range": "1922-1991"
+  },
+  {
+    "current_name": "Armenia",
+    "previous_name": "Soviet Union",
+    "year_range": "1922-1991"
+  },
+  {
+    "current_name": "Azerbaijan",
+    "previous_name": "Soviet Union",
+    "year_range": "1922-1991"
+  },
+  {
+    "current_name": "Lithuania",
+    "previous_name": "Soviet Union",
+    "year_range": "1940-1991"
+  },
+  {
+    "current_name": "Latvia",
+    "previous_name": "Soviet Union",
+    "year_range": "1940-1991"
+  },
+  {
+    "current_name": "Estonia",
+    "previous_name": "Soviet Union",
+    "year_range": "1940-1991"
+  },
+  {
+    "current_name": "Moldova",
+    "previous_name": "Soviet Union",
+    "year_range": "1940-1991"
+  },
+  {
+    "current_name": "Russia",
+    "previous_name": "Russian Empire",
+    "year_range": "1840-1917"
+  },
+  {
+    "current_name": "Croatia",
+    "previous_name": "Yugoslavia",
+    "year_range": "1918-1991"
+  },
+  {
+    "current_name": "Serbia",
+    "previous_name": "Yugoslavia",
+    "year_range": "1918-1991"
+  },
+  {
+    "current_name": "Bosnia and Herzegovina",
+    "previous_name": "Yugoslavia",
+    "year_range": "1918-1992"
+  },
+  {
+    "current_name": "Slovenia",
+    "previous_name": "Yugoslavia",
+    "year_range": "1918-1991"
+  },
+  {
+    "current_name": "Montenegro",
+    "previous_name": "Yugoslavia",
+    "year_range": "1918-2006"
+  },
+  {
+    "current_name": "North Macedonia",
+    "previous_name": "Yugoslavia",
+    "year_range": "1918-1991"
+  },
+  {
+    "current_name": "Poland",
+    "previous_name": "Congress Poland",
+    "year_range": "1840-1915"
+  },
+  {
+    "current_name": "Italy",
+    "previous_name": "Kingdom of Sardinia",
+    "year_range": "1840-1861"
+  },
+  {
+    "current_name": "Italy",
+    "previous_name": "Kingdom of Two Sicilies",
+    "year_range": "1840-1861"
+  },
+  {
+    "current_name": "Italy",
+    "previous_name": "Papal States",
+    "year_range": "1840-1870"
+  },
+  {
+    "current_name": "Bangladesh",
+    "previous_name": "East Pakistan",
+    "year_range": "1947-1971"
+  },
+  {
+    "current_name": "Pakistan",
+    "previous_name": "British India",
+    "year_range": "1840-1947"
+  },
+  {
+    "current_name": "India",
+    "previous_name": "British India",
+    "year_range": "1840-1947"
+  },
+  {
+    "current_name": "Myanmar",
+    "previous_name": "Burma",
+    "year_range": "1840-1989"
+  },
+  {
+    "current_name": "Sri Lanka",
+    "previous_name": "Ceylon",
+    "year_range": "1840-1972"
+  },
+  {
+    "current_name": "Thailand",
+    "previous_name": "Siam",
+    "year_range": "1840-1939"
+  },
+  {
+    "current_name": "Ethiopia",
+    "previous_name": "Abyssinia",
+    "year_range": "1840-1974"
+  },
+  {
+    "current_name": "Zimbabwe",
+    "previous_name": "Rhodesia",
+    "year_range": "1965-1979"
+  },
+  {
+    "current_name": "Zimbabwe",
+    "previous_name": "Southern Rhodesia",
+    "year_range": "1923-1965"
+  },
+  {
+    "current_name": "Zambia",
+    "previous_name": "Northern Rhodesia",
+    "year_range": "1911-1964"
+  },
+  {
+    "current_name": "Malawi",
+    "previous_name": "Nyasaland",
+    "year_range": "1907-1964"
+  },
+  {
+    "current_name": "Ghana",
+    "previous_name": "Gold Coast",
+    "year_range": "1840-1957"
+  },
+  {
+    "current_name": "Botswana",
+    "previous_name": "Bechuanaland",
+    "year_range": "1885-1966"
+  },
+  {
+    "current_name": "Lesotho",
+    "previous_name": "Basutoland",
+    "year_range": "1868-1966"
+  },
+  {
+    "current_name": "Burkina Faso",
+    "previous_name": "Upper Volta",
+    "year_range": "1919-1984"
+  },
+  {
+    "current_name": "Democratic Republic of the Congo",
+    "previous_name": "Zaire",
+    "year_range": "1971-1997"
+  },
+  {
+    "current_name": "Democratic Republic of the Congo",
+    "previous_name": "Belgian Congo",
+    "year_range": "1908-1960"
+  },
+  {
+    "current_name": "Democratic Republic of the Congo",
+    "previous_name": "Congo Free State",
+    "year_range": "1885-1908"
+  },
+  {
+    "current_name": "Benin",
+    "previous_name": "Dahomey",
+    "year_range": "1840-1975"
+  },
+  {
+    "current_name": "Tanzania",
+    "previous_name": "Tanganyika",
+    "year_range": "1920-1964"
+  },
+  {
+    "current_name": "Namibia",
+    "previous_name": "South West Africa",
+    "year_range": "1915-1990"
+  },
+  {
+    "current_name": "Turkey",
+    "previous_name": "Ottoman Empire",
+    "year_range": "1840-1922"
+  },
+  {
+    "current_name": "Jordan",
+    "previous_name": "Transjordan",
+    "year_range": "1921-1946"
+  },
+  {
+    "current_name": "Iraq",
+    "previous_name": "Mesopotamia",
+    "year_range": "1920-1932"
+  },
+  {
+    "current_name": "Saudi Arabia",
+    "previous_name": "Nejd and Hejaz",
+    "year_range": "1926-1932"
+  },
+  {
+    "current_name": "Yemen",
+    "previous_name": "North Yemen",
+    "year_range": "1918-1990"
+  },
+  {
+    "current_name": "Yemen",
+    "previous_name": "South Yemen",
+    "year_range": "1967-1990"
+  },
+  {
+    "current_name": "Vietnam",
+    "previous_name": "North Vietnam",
+    "year_range": "1954-1976"
+  },
+  {
+    "current_name": "Vietnam",
+    "previous_name": "South Vietnam",
+    "year_range": "1955-1976"
+  },
+  {
+    "current_name": "Vietnam",
+    "previous_name": "French Indochina",
+    "year_range": "1887-1954"
+  },
+  {
+    "current_name": "Cambodia",
+    "previous_name": "French Indochina",
+    "year_range": "1887-1953"
+  },
+  {
+    "current_name": "Laos",
+    "previous_name": "French Indochina",
+    "year_range": "1893-1953"
+  },
+  {
+    "current_name": "Indonesia",
+    "previous_name": "Dutch East Indies",
+    "year_range": "1840-1945"
+  },
+  {
+    "current_name": "Malaysia",
+    "previous_name": "Malaya",
+    "year_range": "1840-1963"
+  },
+  {
+    "current_name": "Singapore",
+    "previous_name": "Straits Settlements",
+    "year_range": "1840-1946"
+  },
+  {
+    "current_name": "Belize",
+    "previous_name": "British Honduras",
+    "year_range": "1840-1973"
+  },
+  {
+    "current_name": "Guyana",
+    "previous_name": "British Guiana",
+    "year_range": "1840-1966"
+  },
+  {
+    "current_name": "Suriname",
+    "previous_name": "Dutch Guiana",
+    "year_range": "1840-1975"
+  },
+  {
+    "current_name": "Iran",
+    "previous_name": "Persia",
+    "year_range": "1840-1935"
+  },
+  {
+    "current_name": "Taiwan",
+    "previous_name": "Formosa",
+    "year_range": "1840-1945"
+  },
+  {
+    "current_name": "Kiribati",
+    "previous_name": "Gilbert Islands",
+    "year_range": "1892-1979"
+  },
+  {
+    "current_name": "Vanuatu",
+    "previous_name": "New Hebrides",
+    "year_range": "1906-1980"
+  },
+  {
+    "current_name": "Tuvalu",
+    "previous_name": "Ellice Islands",
+    "year_range": "1892-1978"
+  }
+]
