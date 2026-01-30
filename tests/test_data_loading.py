@@ -64,6 +64,18 @@ class TestCountryNamesLoading:
         """Test that FileNotFoundError is raised for non-existent file."""
         with pytest.raises(FileNotFoundError):
             load_country_names('/nonexistent/path/to/file.json')
+    
+    def test_load_country_names_invalid_json(self):
+        """Test that JSONDecodeError is raised for invalid JSON."""
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False, encoding='utf-8') as f:
+            f.write("{ invalid json content }")
+            temp_path = f.name
+        
+        try:
+            with pytest.raises(json.JSONDecodeError):
+                load_country_names(temp_path)
+        finally:
+            os.unlink(temp_path)
 
 
 class TestBritishEmpireCommonwealthLoading:
@@ -107,3 +119,15 @@ class TestBritishEmpireCommonwealthLoading:
         """Test that FileNotFoundError is raised for non-existent file."""
         with pytest.raises(FileNotFoundError):
             load_british_empire_commonwealth('/nonexistent/path/to/file.json')
+    
+    def test_load_british_empire_commonwealth_invalid_json(self):
+        """Test that JSONDecodeError is raised for invalid JSON."""
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False, encoding='utf-8') as f:
+            f.write("{ invalid json content }")
+            temp_path = f.name
+        
+        try:
+            with pytest.raises(json.JSONDecodeError):
+                load_british_empire_commonwealth(temp_path)
+        finally:
+            os.unlink(temp_path)
