@@ -694,6 +694,8 @@ class MainWindow(QMainWindow):
         Args:
             decades: List of decade strings to add to the filter.
         """
+        from model import parse_decade_string
+        
         current_selection = self.decade_filter.currentText()
         self.decade_filter.clear()
         
@@ -702,15 +704,11 @@ class MainWindow(QMainWindow):
         
         # Sort decades: numeric decades first (chronologically), then "Unknown"
         def sort_key(decade):
-            if decade == "Unknown":
-                return (1, "")  # Put Unknown at the end
+            parsed = parse_decade_string(decade)
+            if parsed is None:
+                return (1, "")  # Put Unknown/invalid at the end
             else:
-                # Extract the numeric part (e.g., "1840s" -> 1840)
-                try:
-                    numeric_value = int(decade[:-1]) if decade.endswith('s') else int(decade)
-                    return (0, numeric_value)
-                except ValueError:
-                    return (1, decade)  # Other non-numeric values at the end
+                return (0, parsed)
         
         sorted_decades = sorted(decades, key=sort_key)
         

@@ -254,7 +254,7 @@ class StampController:
         Returns:
             List of stamps matching the current filters.
         """
-        from model import parse_date_field, get_decade_from_year
+        from model import parse_date_field, get_decade_from_year, parse_decade_string
         
         stamps = self.database.get_all_stamps()
         
@@ -268,23 +268,22 @@ class StampController:
         # Apply decade filter
         if self.current_decade_filter != "All Decades":
             filtered_by_decade = []
+            filter_decade = parse_decade_string(self.current_decade_filter)
+            
             for stamp in stamps:
-                if self.current_decade_filter == "Unknown":
-                    # Include stamps with unparseable dates
-                    year = parse_date_field(stamp.dates)
+                year = parse_date_field(stamp.dates)
+                
+                if filter_decade is None:
+                    # "Unknown" filter - include stamps with unparseable dates
                     if year is None:
                         filtered_by_decade.append(stamp)
                 else:
-                    # Parse the decade filter (e.g., "1840s" -> 1840)
-                    try:
-                        filter_decade = int(self.current_decade_filter[:-1]) if self.current_decade_filter.endswith('s') else int(self.current_decade_filter)
-                        year = parse_date_field(stamp.dates)
-                        if year is not None:
-                            stamp_decade = get_decade_from_year(year)
-                            if stamp_decade == filter_decade:
-                                filtered_by_decade.append(stamp)
-                    except ValueError:
-                        pass
+                    # Numeric decade filter
+                    if year is not None:
+                        stamp_decade = get_decade_from_year(year)
+                        if stamp_decade == filter_decade:
+                            filtered_by_decade.append(stamp)
+            
             stamps = filtered_by_decade
         
         return stamps
