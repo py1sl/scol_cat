@@ -9,6 +9,7 @@ from dataclasses import dataclass, field, asdict
 from typing import List, Optional, Union
 from datetime import datetime
 import uuid
+import pandas as pd
 
 
 def parse_date_field(date_str: str) -> Optional[int]:
@@ -285,3 +286,61 @@ class StampDatabase:
             else:
                 decade_counts["Unknown"] = decade_counts.get("Unknown", 0) + 1
         return decade_counts
+
+
+def load_country_names(file_path: Optional[str] = None) -> pd.DataFrame:
+    """
+    Load country names data from JSON file into a pandas DataFrame.
+    
+    Args:
+        file_path: Path to the country_names.json file. If None, uses default path
+                   in the data directory relative to this module.
+    
+    Returns:
+        DataFrame with columns: current_name, previous_name, year_range
+    
+    Raises:
+        FileNotFoundError: If the file doesn't exist
+        json.JSONDecodeError: If the file is not valid JSON
+    """
+    if file_path is None:
+        # Default path: data/country_names.json relative to this module
+        module_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(module_dir, 'data', 'country_names.json')
+    
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Country names file not found: {file_path}")
+    
+    with open(file_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    
+    return pd.DataFrame(data)
+
+
+def load_british_empire_commonwealth(file_path: Optional[str] = None) -> List[str]:
+    """
+    Load British Empire and Commonwealth countries from JSON file into a list.
+    
+    Args:
+        file_path: Path to the british_empire_commonwealth.json file. If None, 
+                   uses default path in the data directory relative to this module.
+    
+    Returns:
+        List of country names
+    
+    Raises:
+        FileNotFoundError: If the file doesn't exist
+        json.JSONDecodeError: If the file is not valid JSON
+    """
+    if file_path is None:
+        # Default path: data/british_empire_commonwealth.json relative to this module
+        module_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(module_dir, 'data', 'british_empire_commonwealth.json')
+    
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"British Empire/Commonwealth file not found: {file_path}")
+    
+    with open(file_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    
+    return data
