@@ -701,14 +701,14 @@ class MainWindow(QMainWindow):
         self.decade_filter.addItem("All Decades")
         
         # Sort decades: numeric decades first (chronologically), then "Unknown"
-        def sort_key(decade):
+        def decade_sort_key(decade):
             parsed = parse_decade_string(decade)
             if parsed is None:
                 return (1, "")  # Put Unknown/invalid at the end
             else:
                 return (0, parsed)
         
-        sorted_decades = sorted(decades, key=sort_key)
+        sorted_decades = sorted(decades, key=decade_sort_key)
         
         # Add unique decades
         for decade in sorted_decades:

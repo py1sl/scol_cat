@@ -1,4 +1,4 @@
-"""Unit tests for filtering functionality."""
+"""Unit tests for filtering functionality including country and decade filters."""
 import pytest
 from model import Stamp, StampDatabase
 
