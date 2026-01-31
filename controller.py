@@ -5,7 +5,7 @@ Coordinates between Model and View following MVC pattern.
 from PySide6.QtWidgets import QFileDialog, QMessageBox
 from typing import Optional, List
 
-from model import StampDatabase, Stamp
+from model import StampDatabase, Stamp, parse_date_field, get_decade_from_year, parse_decade_string
 from view import MainWindow, StampDialog, StatisticsDialog, DecadeStatisticsDialog
 
 
@@ -254,8 +254,6 @@ class StampController:
         Returns:
             List of stamps matching the current filters.
         """
-        from model import parse_date_field, get_decade_from_year, parse_decade_string
-        
         stamps = self.database.get_all_stamps()
         
         # Apply country filter

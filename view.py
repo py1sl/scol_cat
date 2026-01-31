@@ -17,7 +17,7 @@ matplotlib.use('QtAgg')  # Use Qt backend for matplotlib (Qt5/Qt6 compatible)
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-from model import Stamp, StampDatabase
+from model import Stamp, StampDatabase, parse_decade_string
 
 
 class StampDialog(QDialog):
@@ -694,8 +694,6 @@ class MainWindow(QMainWindow):
         Args:
             decades: List of decade strings to add to the filter.
         """
-        from model import parse_decade_string
-        
         current_selection = self.decade_filter.currentText()
         self.decade_filter.clear()
         
