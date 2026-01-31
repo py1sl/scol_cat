@@ -92,6 +92,7 @@ class Stamp:
     comments: str = ""
     catalogue_ids: str = ""
     collection_number: str = ""
+    keywords: str = ""
     
     def to_dict(self) -> dict:
         """Convert stamp to dictionary."""

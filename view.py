@@ -68,6 +68,9 @@ class StampDialog(QDialog):
         self.catalogue_ids_edit = QLineEdit()
         form_layout.addRow("Catalogue IDs:", self.catalogue_ids_edit)
         
+        self.keywords_edit = QLineEdit()
+        form_layout.addRow("Keywords:", self.keywords_edit)
+        
         self.comments_edit = QTextEdit()
         self.comments_edit.setMaximumHeight(100)
         form_layout.addRow("Comments:", self.comments_edit)
@@ -106,6 +109,7 @@ class StampDialog(QDialog):
         self.dates_edit.setText(stamp.dates)
         self.collection_number_edit.setText(stamp.collection_number)
         self.catalogue_ids_edit.setText(stamp.catalogue_ids)
+        self.keywords_edit.setText(stamp.keywords)
         self.comments_edit.setPlainText(stamp.comments)
         
         if stamp.image_path:
@@ -127,6 +131,7 @@ class StampDialog(QDialog):
         stamp.dates = self.dates_edit.text()
         stamp.collection_number = self.collection_number_edit.text()
         stamp.catalogue_ids = self.catalogue_ids_edit.text()
+        stamp.keywords = self.keywords_edit.text()
         stamp.comments = self.comments_edit.toPlainText()
         
         return stamp
