@@ -17,13 +17,13 @@ matplotlib.use('QtAgg')  # Use Qt backend for matplotlib (Qt5/Qt6 compatible)
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-from model import Stamp
+from model import Stamp, StampDatabase
 
 
 class StampDialog(QDialog):
     """Dialog for adding or editing a stamp entry."""
     
-    def __init__(self, parent=None, stamp: Optional[Stamp] = None, database=None):
+    def __init__(self, parent=None, stamp: Optional[Stamp] = None, database: Optional['StampDatabase'] = None):
         super().__init__(parent)
         self.stamp = stamp
         self.database = database
