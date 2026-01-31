@@ -23,9 +23,10 @@ from model import Stamp
 class StampDialog(QDialog):
     """Dialog for adding or editing a stamp entry."""
     
-    def __init__(self, parent=None, stamp: Optional[Stamp] = None):
+    def __init__(self, parent=None, stamp: Optional[Stamp] = None, database=None):
         super().__init__(parent)
         self.stamp = stamp
+        self.database = database
         self.image_path = stamp.image_path if stamp else ""
         self.setup_ui()
         
@@ -76,7 +77,7 @@ class StampDialog(QDialog):
         # Buttons
         button_layout = QHBoxLayout()
         save_button = QPushButton("Save")
-        save_button.clicked.connect(self.accept)
+        save_button.clicked.connect(self.validate_and_accept)
         cancel_button = QPushButton("Cancel")
         cancel_button.clicked.connect(self.reject)
         button_layout.addStretch()
@@ -129,6 +130,40 @@ class StampDialog(QDialog):
         stamp.comments = self.comments_edit.toPlainText()
         
         return stamp
+    
+    def validate_and_accept(self):
+        """Validate stamp data before accepting the dialog."""
+        # Get the current stamp data
+        name = self.name_edit.text().strip()
+        image_path = self.image_path.strip()
+        
+        # Check if database is provided for validation
+        if self.database:
+            # Get the ID to exclude from validation (for editing)
+            exclude_id = self.stamp.unique_id if self.stamp else None
+            
+            # Check if name is already in use
+            if name and self.database.is_name_in_use(name, exclude_id):
+                QMessageBox.warning(
+                    self,
+                    "Duplicate Name",
+                    f"The name '{name}' is already in use by another stamp.\n"
+                    "Please choose a different name."
+                )
+                return
+            
+            # Check if image path is already in use
+            if image_path and self.database.is_image_path_in_use(image_path, exclude_id):
+                QMessageBox.warning(
+                    self,
+                    "Duplicate Image Path",
+                    f"The image path '{os.path.basename(image_path)}' is already in use by another stamp.\n"
+                    "Please choose a different image."
+                )
+                return
+        
+        # If validation passes, accept the dialog
+        self.accept()
 
 
 class StampDetailsWidget(QWidget):

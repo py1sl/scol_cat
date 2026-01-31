@@ -141,11 +141,14 @@ class StampController:
     
     def add_stamp(self):
         """Add a new stamp to the collection."""
-        dialog = StampDialog(self.view)
+        dialog = StampDialog(self.view, database=self.database)
         
         if dialog.exec():
             stamp = dialog.get_stamp_data()
             self.database.add_stamp(stamp)
+            # Auto-save the database after adding a stamp
+            if self.database.file_path:
+                self.database.save()
             self.refresh_view()
             self.view.set_status_message("Stamp added successfully")
     
@@ -165,11 +168,14 @@ class StampController:
             )
             return
         
-        dialog = StampDialog(self.view, stamp)
+        dialog = StampDialog(self.view, stamp, database=self.database)
         
         if dialog.exec():
             updated_stamp = dialog.get_stamp_data()
             if self.database.update_stamp(unique_id, updated_stamp):
+                # Auto-save the database after updating a stamp
+                if self.database.file_path:
+                    self.database.save()
                 self.refresh_view()
                 self.view.set_status_message("Stamp updated successfully")
                 # Re-select the updated stamp

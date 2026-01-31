@@ -265,6 +265,44 @@ class StampDatabase:
         """
         return len(self.stamps)
     
+    def is_name_in_use(self, name: str, exclude_id: Optional[str] = None) -> bool:
+        """
+        Check if a stamp name is already in use.
+        
+        Args:
+            name: The name to check
+            exclude_id: Optional ID to exclude from the check (for editing)
+            
+        Returns:
+            True if the name is already in use, False otherwise
+        """
+        if not name or not name.strip():
+            return False
+        
+        for stamp in self.stamps:
+            if stamp.unique_id != exclude_id and stamp.name == name:
+                return True
+        return False
+    
+    def is_image_path_in_use(self, image_path: str, exclude_id: Optional[str] = None) -> bool:
+        """
+        Check if an image path is already in use.
+        
+        Args:
+            image_path: The image path to check
+            exclude_id: Optional ID to exclude from the check (for editing)
+            
+        Returns:
+            True if the image path is already in use, False otherwise
+        """
+        if not image_path or not image_path.strip():
+            return False
+        
+        for stamp in self.stamps:
+            if stamp.unique_id != exclude_id and stamp.image_path == image_path:
+                return True
+        return False
+    
     def get_decade_statistics(self) -> dict:
         """
         Get statistics on stamp counts by decade.
