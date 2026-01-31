@@ -5,7 +5,7 @@ Coordinates between Model and View following MVC pattern.
 from PySide6.QtWidgets import QFileDialog, QMessageBox
 from typing import Optional, List
 
-from model import StampDatabase, Stamp
+from model import StampDatabase, Stamp, parse_date_field, get_decade_from_year, parse_decade_string
 from view import MainWindow, StampDialog, StatisticsDialog, DecadeStatisticsDialog
 
 
@@ -16,6 +16,7 @@ class StampController:
         self.database = StampDatabase()
         self.view = MainWindow()
         self.current_filter = "All Countries"
+        self.current_decade_filter = "All Decades"
         
         # Connect signals from view to controller methods
         self.view.load_database_requested.connect(self.load_database)
@@ -26,6 +27,7 @@ class StampController:
         self.view.delete_stamp_requested.connect(self.delete_stamp)
         self.view.stamp_selected.connect(self.show_stamp_details)
         self.view.country_filter_changed.connect(self.on_country_filter_changed)
+        self.view.decade_filter_changed.connect(self.on_decade_filter_changed)
         self.view.statistics_requested.connect(self.show_statistics)
         self.view.decade_statistics_requested.connect(self.show_decade_statistics)
     
@@ -228,6 +230,11 @@ class StampController:
         )
         self.view.update_country_filter(list(countries))
         
+        # Update decade filter options
+        decade_stats = self.database.get_decade_statistics()
+        decades = list(decade_stats.keys())
+        self.view.update_decade_filter(decades)
+        
         # Apply current filter
         filtered_stamps = self.get_filtered_stamps()
         self.view.update_stamp_list(filtered_stamps)
@@ -242,34 +249,70 @@ class StampController:
     
     def get_filtered_stamps(self) -> List[Stamp]:
         """
-        Get stamps filtered by current country filter.
+        Get stamps filtered by current country and decade filters.
         
         Returns:
-            List of stamps matching the current country filter.
-            Returns all stamps if filter is "All Countries".
+            List of stamps matching the current filters.
         """
         stamps = self.database.get_all_stamps()
         
-        if self.current_filter == "All Countries":
-            return stamps
+        # Apply country filter
+        if self.current_filter != "All Countries":
+            stamps = [
+                stamp for stamp in stamps 
+                if stamp.country is not None and stamp.country == self.current_filter
+            ]
         
-        # Filter stamps by country, handling None values
-        return [
-            stamp for stamp in stamps 
-            if stamp.country is not None and stamp.country == self.current_filter
-        ]
+        # Apply decade filter
+        if self.current_decade_filter != "All Decades":
+            filtered_by_decade = []
+            filter_decade = parse_decade_string(self.current_decade_filter)
+            
+            for stamp in stamps:
+                year = parse_date_field(stamp.dates)
+                
+                if filter_decade is None:
+                    # "Unknown" filter - include stamps with unparseable dates
+                    if year is None:
+                        filtered_by_decade.append(stamp)
+                else:
+                    # Numeric decade filter
+                    if year is not None:
+                        stamp_decade = get_decade_from_year(year)
+                        if stamp_decade == filter_decade:
+                            filtered_by_decade.append(stamp)
+            
+            stamps = filtered_by_decade
+        
+        return stamps
     
     def on_country_filter_changed(self, country: str):
         """Handle country filter change."""
         self.current_filter = country
+        self.update_filtered_view()
+    
+    def on_decade_filter_changed(self, decade: str):
+        """Handle decade filter change."""
+        self.current_decade_filter = decade
+        self.update_filtered_view()
+    
+    def update_filtered_view(self):
+        """Update the view with current filters applied."""
         filtered_stamps = self.get_filtered_stamps()
         self.view.update_stamp_list(filtered_stamps)
         
         # Update status message
-        if country == "All Countries":
-            self.view.set_status_message(f"Showing all stamps ({len(filtered_stamps)} total)")
+        filters = []
+        if self.current_filter != "All Countries":
+            filters.append(self.current_filter)
+        if self.current_decade_filter != "All Decades":
+            filters.append(self.current_decade_filter)
+        
+        if filters:
+            filter_text = ", ".join(filters)
+            self.view.set_status_message(f"Filtered by {filter_text} ({len(filtered_stamps)} stamps)")
         else:
-            self.view.set_status_message(f"Filtered by {country} ({len(filtered_stamps)} stamps)")
+            self.view.set_status_message(f"Showing all stamps ({len(filtered_stamps)} total)")
     
     def show_statistics(self):
         """Display statistics dialog."""

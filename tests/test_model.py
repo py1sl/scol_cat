@@ -3,7 +3,7 @@ import json
 import os
 import tempfile
 import pytest
-from model import Stamp, StampDatabase, parse_date_field, get_decade_from_year
+from model import Stamp, StampDatabase, parse_date_field, get_decade_from_year, parse_decade_string
 
 
 class TestDateParsing:
@@ -68,6 +68,23 @@ class TestDateParsing:
         assert get_decade_from_year(1999) == 1990
         assert get_decade_from_year(2000) == 2000
         assert get_decade_from_year(2024) == 2020
+    
+    def test_parse_decade_string(self):
+        """Test parsing decade strings."""
+        assert parse_decade_string("1840s") == 1840
+        assert parse_decade_string("1850s") == 1850
+        assert parse_decade_string("1990s") == 1990
+        assert parse_decade_string("2020s") == 2020
+        
+        # Without 's' suffix
+        assert parse_decade_string("1840") == 1840
+        
+        # Unknown should return None
+        assert parse_decade_string("Unknown") is None
+        
+        # Invalid strings should return None
+        assert parse_decade_string("invalid") is None
+        assert parse_decade_string("") is None
 
 
 class TestStamp:

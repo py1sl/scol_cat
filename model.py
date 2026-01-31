@@ -81,6 +81,29 @@ def get_decade_from_year(year: int) -> int:
     return (year // 10) * 10
 
 
+def parse_decade_string(decade_str: str) -> Optional[int]:
+    """
+    Parse a decade string to get its numeric value.
+    
+    Args:
+        decade_str: Decade string (e.g., "1840s", "1850s", "Unknown")
+        
+    Returns:
+        The decade as an integer (e.g., 1840), or None if it's "Unknown" or invalid
+    """
+    if decade_str == "Unknown":
+        return None
+    
+    try:
+        # Parse strings like "1840s" -> 1840
+        if decade_str.endswith('s'):
+            return int(decade_str[:-1])
+        else:
+            return int(decade_str)
+    except ValueError:
+        return None
+
+
 @dataclass
 class Stamp:
     """Represents a single stamp entry in the collection."""
