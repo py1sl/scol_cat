@@ -475,6 +475,7 @@ class MainWindow(QMainWindow):
     save_database_requested = Signal()
     new_database_requested = Signal()
     country_filter_changed = Signal(str)  # Emits selected country
+    decade_filter_changed = Signal(str)  # Emits selected decade
     statistics_requested = Signal()
     decade_statistics_requested = Signal()
     
@@ -500,18 +501,38 @@ class MainWindow(QMainWindow):
         # Create splitter for list and details
         splitter = QSplitter(Qt.Horizontal)
         
-        # Left panel - List of stamps
+        # Left panel - contains filters and stamp list in horizontal layout
         left_panel = QWidget()
-        left_layout = QVBoxLayout()
+        left_main_layout = QHBoxLayout()
+        left_main_layout.setContentsMargins(0, 0, 0, 0)
         
-        # Filter section
-        filter_layout = QHBoxLayout()
-        filter_label = QLabel("Filter by Country:")
+        # Filter side panel
+        filter_panel = QGroupBox("Filters")
+        filter_panel.setMaximumWidth(200)
+        filter_layout = QVBoxLayout()
+        
+        # Country filter
+        country_label = QLabel("Country:")
         self.country_filter = QComboBox()
-        self.country_filter.currentTextChanged.connect(self.on_filter_changed)
-        filter_layout.addWidget(filter_label)
-        filter_layout.addWidget(self.country_filter, 1)
-        left_layout.addLayout(filter_layout)
+        self.country_filter.currentTextChanged.connect(self.on_country_filter_changed)
+        filter_layout.addWidget(country_label)
+        filter_layout.addWidget(self.country_filter)
+        
+        # Decade filter
+        decade_label = QLabel("Decade:")
+        self.decade_filter = QComboBox()
+        self.decade_filter.currentTextChanged.connect(self.on_decade_filter_changed)
+        filter_layout.addWidget(decade_label)
+        filter_layout.addWidget(self.decade_filter)
+        
+        filter_layout.addStretch()
+        filter_panel.setLayout(filter_layout)
+        left_main_layout.addWidget(filter_panel)
+        
+        # Stamps list panel
+        list_panel = QWidget()
+        list_layout = QVBoxLayout()
+        list_layout.setContentsMargins(0, 0, 0, 0)
         
         # Buttons
         button_layout = QHBoxLayout()
@@ -525,14 +546,17 @@ class MainWindow(QMainWindow):
         button_layout.addWidget(add_button)
         button_layout.addWidget(edit_button)
         button_layout.addWidget(delete_button)
-        left_layout.addLayout(button_layout)
+        list_layout.addLayout(button_layout)
         
         # List widget
         self.stamp_list = QListWidget()
         self.stamp_list.itemSelectionChanged.connect(self.on_selection_changed)
-        left_layout.addWidget(self.stamp_list)
+        list_layout.addWidget(self.stamp_list)
         
-        left_panel.setLayout(left_layout)
+        list_panel.setLayout(list_layout)
+        left_main_layout.addWidget(list_panel)
+        
+        left_panel.setLayout(left_main_layout)
         splitter.addWidget(left_panel)
         
         # Right panel - Stamp details
@@ -663,9 +687,50 @@ class MainWindow(QMainWindow):
         if index >= 0:
             self.country_filter.setCurrentIndex(index)
     
-    def on_filter_changed(self, country: str):
+    def update_decade_filter(self, decades: List[str]):
+        """
+        Update the decade filter dropdown with available decades.
+        
+        Args:
+            decades: List of decade strings to add to the filter.
+        """
+        current_selection = self.decade_filter.currentText()
+        self.decade_filter.clear()
+        
+        # Add "All Decades" as first option
+        self.decade_filter.addItem("All Decades")
+        
+        # Sort decades: numeric decades first (chronologically), then "Unknown"
+        def sort_key(decade):
+            if decade == "Unknown":
+                return (1, "")  # Put Unknown at the end
+            else:
+                # Extract the numeric part (e.g., "1840s" -> 1840)
+                try:
+                    numeric_value = int(decade[:-1]) if decade.endswith('s') else int(decade)
+                    return (0, numeric_value)
+                except ValueError:
+                    return (1, decade)  # Other non-numeric values at the end
+        
+        sorted_decades = sorted(decades, key=sort_key)
+        
+        # Add unique decades
+        for decade in sorted_decades:
+            if decade:  # Only add non-empty decades
+                self.decade_filter.addItem(decade)
+        
+        # Restore previous selection if it still exists
+        index = self.decade_filter.findText(current_selection)
+        if index >= 0:
+            self.decade_filter.setCurrentIndex(index)
+    
+    def on_country_filter_changed(self, country: str):
         """Handle country filter change."""
         self.country_filter_changed.emit(country)
+    
+    def on_decade_filter_changed(self, decade: str):
+        """Handle decade filter change."""
+        self.decade_filter_changed.emit(decade)
     
     def on_full_details_toggled(self, checked: bool):
         """Handle full details toggle."""
