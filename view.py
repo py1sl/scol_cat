@@ -508,7 +508,7 @@ class MainWindow(QMainWindow):
         
         # Filter side panel
         filter_panel = QGroupBox("Filters")
-        filter_panel.setMaximumWidth(200)
+        filter_panel.setMaximumWidth(400)
         filter_layout = QVBoxLayout()
         
         # Country filter
