@@ -69,6 +69,13 @@ The application follows the **Model-View-Controller (MVC)** pattern:
 - **View** (`view.py`): PySide6 GUI components
 - **Controller** (`controller.py`): Business logic and coordination
 
+## Documentation
+
+Additional documentation is available in the [`docs/`](docs/) folder:
+- [Data Loading Functions](docs/DATA_LOADING.md) - Information about loading country data
+- [Testing Guide](docs/TESTING.md) - How to run tests and view coverage
+- [Implementation Summary](docs/IMPLEMENTATION_SUMMARY.md) - Details about recent feature implementations
+
 ## Screenshots
 
 **Main Window (Empty)**
