@@ -54,7 +54,7 @@ Successfully implemented the "Stamps by Decade" feature as requested. This featu
 
 ## Visual Reference
 
-See `stamps_by_decade_mockup.png` for a visual representation of the implemented feature.
+See [`stamps_by_decade_mockup.png`](stamps_by_decade_mockup.png) for a visual representation of the implemented feature.
 
 ## Implementation Notes
 
