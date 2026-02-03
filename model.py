@@ -257,6 +257,44 @@ class StampDatabase:
         """Get all stamps in the collection."""
         return self.stamps.copy()
     
+    def search_stamps(self, search_text: str) -> List[Stamp]:
+        """
+        Search stamps by keyword (case-insensitive).
+        
+        Searches in: name, country, dates, collection_number, catalogue_ids, keywords, comments.
+        
+        Args:
+            search_text: The text to search for (case-insensitive)
+            
+        Returns:
+            List of stamps matching the search text
+        """
+        if not search_text or not search_text.strip():
+            return self.stamps.copy()
+        
+        search_lower = search_text.lower().strip()
+        matching_stamps = []
+        
+        for stamp in self.stamps:
+            # Search in all text fields
+            searchable_fields = [
+                stamp.name,
+                stamp.country,
+                stamp.dates,
+                stamp.collection_number,
+                stamp.catalogue_ids,
+                stamp.keywords,
+                stamp.comments
+            ]
+            
+            # Check if search text appears in any field (case-insensitive)
+            for field in searchable_fields:
+                if field and search_lower in field.lower():
+                    matching_stamps.append(stamp)
+                    break  # Found a match, no need to check other fields
+        
+        return matching_stamps
+    
     def is_modified(self) -> bool:
         """Check if the database has unsaved changes."""
         return self._modified

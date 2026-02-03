@@ -476,6 +476,7 @@ class MainWindow(QMainWindow):
     new_database_requested = Signal()
     country_filter_changed = Signal(str)  # Emits selected country
     decade_filter_changed = Signal(str)  # Emits selected decade
+    search_text_changed = Signal(str)  # Emits search text
     statistics_requested = Signal()
     decade_statistics_requested = Signal()
     
@@ -510,6 +511,14 @@ class MainWindow(QMainWindow):
         filter_panel = QGroupBox("Filters")
         filter_panel.setMaximumWidth(400)
         filter_layout = QVBoxLayout()
+        
+        # Search box
+        search_label = QLabel("Search:")
+        self.search_box = QLineEdit()
+        self.search_box.setPlaceholderText("Enter keywords to search...")
+        self.search_box.textChanged.connect(self.on_search_text_changed)
+        filter_layout.addWidget(search_label)
+        filter_layout.addWidget(self.search_box)
         
         # Country filter
         country_label = QLabel("Country:")
@@ -727,6 +736,10 @@ class MainWindow(QMainWindow):
     def on_decade_filter_changed(self, decade: str):
         """Handle decade filter change."""
         self.decade_filter_changed.emit(decade)
+    
+    def on_search_text_changed(self, text: str):
+        """Handle search text change."""
+        self.search_text_changed.emit(text)
     
     def on_full_details_toggled(self, checked: bool):
         """Handle full details toggle."""

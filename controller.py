@@ -17,6 +17,7 @@ class StampController:
         self.view = MainWindow()
         self.current_filter = "All Countries"
         self.current_decade_filter = "All Decades"
+        self.current_search_text = ""
         
         # Connect signals from view to controller methods
         self.view.load_database_requested.connect(self.load_database)
@@ -28,6 +29,7 @@ class StampController:
         self.view.stamp_selected.connect(self.show_stamp_details)
         self.view.country_filter_changed.connect(self.on_country_filter_changed)
         self.view.decade_filter_changed.connect(self.on_decade_filter_changed)
+        self.view.search_text_changed.connect(self.on_search_text_changed)
         self.view.statistics_requested.connect(self.show_statistics)
         self.view.decade_statistics_requested.connect(self.show_decade_statistics)
     
@@ -249,12 +251,16 @@ class StampController:
     
     def get_filtered_stamps(self) -> List[Stamp]:
         """
-        Get stamps filtered by current country and decade filters.
+        Get stamps filtered by current search text, country, and decade filters.
         
         Returns:
             List of stamps matching the current filters.
         """
-        stamps = self.database.get_all_stamps()
+        # Apply search filter first
+        if self.current_search_text and self.current_search_text.strip():
+            stamps = self.database.search_stamps(self.current_search_text)
+        else:
+            stamps = self.database.get_all_stamps()
         
         # Apply country filter
         if self.current_filter != "All Countries":
@@ -296,6 +302,11 @@ class StampController:
         self.current_decade_filter = decade
         self.update_filtered_view()
     
+    def on_search_text_changed(self, text: str):
+        """Handle search text change."""
+        self.current_search_text = text
+        self.update_filtered_view()
+    
     def update_filtered_view(self):
         """Update the view with current filters applied."""
         filtered_stamps = self.get_filtered_stamps()
@@ -303,6 +314,8 @@ class StampController:
         
         # Update status message
         filters = []
+        if self.current_search_text and self.current_search_text.strip():
+            filters.append(f'search: "{self.current_search_text.strip()}"')
         if self.current_filter != "All Countries":
             filters.append(self.current_filter)
         if self.current_decade_filter != "All Decades":
