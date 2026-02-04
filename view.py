@@ -217,6 +217,9 @@ class StampDetailsWidget(QWidget):
         self.catalogue_ids_label = QLabel()
         self.details_layout.addRow("Catalogue IDs:", self.catalogue_ids_label)
         
+        self.keywords_label = QLabel()
+        self.details_layout.addRow("Keywords:", self.keywords_label)
+        
         self.unique_id_label = QLabel()
         self.unique_id_row_label = QLabel("Unique ID:")
         self.details_layout.addRow(self.unique_id_row_label, self.unique_id_label)
@@ -258,6 +261,7 @@ class StampDetailsWidget(QWidget):
         self.dates_label.setText(stamp.dates or "N/A")
         self.collection_number_label.setText(stamp.collection_number or "N/A")
         self.catalogue_ids_label.setText(stamp.catalogue_ids or "N/A")
+        self.keywords_label.setText(stamp.keywords or "N/A")
         self.unique_id_label.setText(stamp.unique_id)
         self.comments_label.setText(stamp.comments or "N/A")
         
@@ -287,6 +291,7 @@ class StampDetailsWidget(QWidget):
         self.dates_label.setText("")
         self.collection_number_label.setText("")
         self.catalogue_ids_label.setText("")
+        self.keywords_label.setText("")
         self.unique_id_label.setText("")
         self.comments_label.setText("")
         self.image_label.clear()
