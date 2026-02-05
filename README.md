@@ -64,10 +64,31 @@ The application uses JSON format for data storage, which is suitable for collect
 
 ## Architecture
 
-The application follows the **Model-View-Controller (MVC)** pattern:
-- **Model** (`model.py`): Data management and persistence
-- **View** (`view.py`): PySide6 GUI components
-- **Controller** (`controller.py`): Business logic and coordination
+The application follows the **Model-View-Controller (MVC)** pattern with clear separation of concerns:
+
+### Model Layer (`model.py`)
+- **Data Structures**: `Stamp` dataclass for stamp entries
+- **Data Persistence**: `StampDatabase` class for JSON-based storage
+- **Utility Classes**: `DateUtils` for date parsing and decade calculations
+- **Data Loading**: Functions for loading country names and British Empire data
+
+### View Layer (`view.py`)
+- **GUI Components**: PySide6 widgets for user interface
+- **No Business Logic**: Pure presentation logic only
+- **No Direct Model Access**: View doesn't import `StampDatabase`
+- **Callback-based Validation**: Uses callbacks provided by Controller
+
+### Controller Layer (`controller.py`)
+- **Orchestration**: Coordinates between Model and View
+- **Business Logic**: Implements validation, filtering, and data operations
+- **Signal Handling**: Connects View signals to Model operations
+- **State Management**: Maintains application state (filters, search, etc.)
+
+### Key Design Principles
+- **Separation of Concerns**: Each layer has a single, well-defined responsibility
+- **Dependency Direction**: View → Controller → Model (never View → Model)
+- **Loose Coupling**: View communicates with Controller via callbacks and signals
+- **Testability**: Business logic in Controller/Model is easily testable
 
 ## Documentation
 

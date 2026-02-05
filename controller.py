@@ -2,6 +2,7 @@
 Controller layer for the stamp collection application.
 Coordinates between Model and View following MVC pattern.
 """
+import os
 from PySide6.QtWidgets import QFileDialog, QMessageBox
 from typing import Optional, List
 
@@ -36,6 +37,28 @@ class StampController:
     def run(self):
         """Start the application."""
         self.view.show()
+    
+    def validate_stamp_data(self, name: str, image_path: str, exclude_id: Optional[str] = None) -> Optional[str]:
+        """
+        Validate stamp data for uniqueness.
+        
+        Args:
+            name: Stamp name to validate
+            image_path: Image path to validate
+            exclude_id: Optional ID to exclude from validation (for editing)
+            
+        Returns:
+            Error message if validation fails, None if validation passes
+        """
+        # Check if name is already in use
+        if name and self.database.is_name_in_use(name, exclude_id):
+            return f"The name '{name}' is already in use by another stamp.\nPlease choose a different name."
+        
+        # Check if image path is already in use
+        if image_path and self.database.is_image_path_in_use(image_path, exclude_id):
+            return f"The image path '{os.path.basename(image_path)}' is already in use by another stamp.\nPlease choose a different image."
+        
+        return None
     
     def load_database(self):
         """Load a database from a JSON file."""
@@ -145,7 +168,7 @@ class StampController:
     
     def add_stamp(self):
         """Add a new stamp to the collection."""
-        dialog = StampDialog(self.view, database=self.database)
+        dialog = StampDialog(self.view, validation_callback=self.validate_stamp_data)
         
         if dialog.exec():
             stamp = dialog.get_stamp_data()
@@ -172,7 +195,7 @@ class StampController:
             )
             return
         
-        dialog = StampDialog(self.view, stamp, database=self.database)
+        dialog = StampDialog(self.view, stamp, validation_callback=self.validate_stamp_data)
         
         if dialog.exec():
             updated_stamp = dialog.get_stamp_data()
@@ -235,7 +258,17 @@ class StampController:
         # Update decade filter options
         decade_stats = self.database.get_decade_statistics()
         decades = list(decade_stats.keys())
-        self.view.update_decade_filter(decades)
+        
+        # Sort decades in Controller: numeric decades first (chronologically), then "Unknown"
+        def decade_sort_key(decade):
+            parsed = parse_decade_string(decade)
+            if parsed is None:
+                return (1, "")  # Put Unknown/invalid at the end
+            else:
+                return (0, parsed)
+        
+        sorted_decades = sorted(decades, key=decade_sort_key)
+        self.view.update_decade_filter(sorted_decades)
         
         # Apply current filter
         filtered_stamps = self.get_filtered_stamps()

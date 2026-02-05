@@ -17,16 +17,31 @@ matplotlib.use('QtAgg')  # Use Qt backend for matplotlib (Qt5/Qt6 compatible)
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-from model import Stamp, StampDatabase, parse_decade_string
+from model import Stamp
+from typing import Callable
 
 
 class StampDialog(QDialog):
     """Dialog for adding or editing a stamp entry."""
     
-    def __init__(self, parent=None, stamp: Optional[Stamp] = None, database: Optional['StampDatabase'] = None):
+    def __init__(
+        self, 
+        parent=None, 
+        stamp: Optional[Stamp] = None, 
+        validation_callback: Optional[Callable[[str, str, Optional[str]], Optional[str]]] = None
+    ):
+        """
+        Initialize the stamp dialog.
+        
+        Args:
+            parent: Parent widget
+            stamp: Existing stamp to edit (None for adding new stamp)
+            validation_callback: Optional callback function for validation.
+                Takes (name, image_path, exclude_id) and returns error message or None if valid.
+        """
         super().__init__(parent)
         self.stamp = stamp
-        self.database = database
+        self.validation_callback = validation_callback
         self.image_path = stamp.image_path if stamp else ""
         self.setup_ui()
         
@@ -142,28 +157,19 @@ class StampDialog(QDialog):
         name = self.name_edit.text().strip()
         image_path = self.image_path.strip()
         
-        # Check if database is provided for validation
-        if self.database:
+        # Check if validation callback is provided
+        if self.validation_callback:
             # Get the ID to exclude from validation (for editing)
             exclude_id = self.stamp.unique_id if self.stamp else None
             
-            # Check if name is already in use
-            if name and self.database.is_name_in_use(name, exclude_id):
-                QMessageBox.warning(
-                    self,
-                    "Duplicate Name",
-                    f"The name '{name}' is already in use by another stamp.\n"
-                    "Please choose a different name."
-                )
-                return
+            # Call the validation callback
+            error_message = self.validation_callback(name, image_path, exclude_id)
             
-            # Check if image path is already in use
-            if image_path and self.database.is_image_path_in_use(image_path, exclude_id):
+            if error_message:
                 QMessageBox.warning(
                     self,
-                    "Duplicate Image Path",
-                    f"The image path '{os.path.basename(image_path)}' is already in use by another stamp.\n"
-                    "Please choose a different image."
+                    "Validation Error",
+                    error_message
                 )
                 return
         
@@ -706,7 +712,7 @@ class MainWindow(QMainWindow):
         Update the decade filter dropdown with available decades.
         
         Args:
-            decades: List of decade strings to add to the filter.
+            decades: List of decade strings to add to the filter (should be pre-sorted).
         """
         current_selection = self.decade_filter.currentText()
         self.decade_filter.clear()
@@ -714,18 +720,8 @@ class MainWindow(QMainWindow):
         # Add "All Decades" as first option
         self.decade_filter.addItem("All Decades")
         
-        # Sort decades: numeric decades first (chronologically), then "Unknown"
-        def decade_sort_key(decade):
-            parsed = parse_decade_string(decade)
-            if parsed is None:
-                return (1, "")  # Put Unknown/invalid at the end
-            else:
-                return (0, parsed)
-        
-        sorted_decades = sorted(decades, key=decade_sort_key)
-        
-        # Add unique decades
-        for decade in sorted_decades:
+        # Add decades (assumed to be already sorted by Controller)
+        for decade in decades:
             if decade:  # Only add non-empty decades
                 self.decade_filter.addItem(decade)
         
