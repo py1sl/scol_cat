@@ -2,6 +2,7 @@
 Controller layer for the stamp collection application.
 Coordinates between Model and View following MVC pattern.
 """
+import os
 from PySide6.QtWidgets import QFileDialog, QMessageBox
 from typing import Optional, List
 
@@ -55,7 +56,6 @@ class StampController:
         
         # Check if image path is already in use
         if image_path and self.database.is_image_path_in_use(image_path, exclude_id):
-            import os
             return f"The image path '{os.path.basename(image_path)}' is already in use by another stamp.\nPlease choose a different image."
         
         return None
@@ -258,7 +258,17 @@ class StampController:
         # Update decade filter options
         decade_stats = self.database.get_decade_statistics()
         decades = list(decade_stats.keys())
-        self.view.update_decade_filter(decades)
+        
+        # Sort decades in Controller: numeric decades first (chronologically), then "Unknown"
+        def decade_sort_key(decade):
+            parsed = parse_decade_string(decade)
+            if parsed is None:
+                return (1, "")  # Put Unknown/invalid at the end
+            else:
+                return (0, parsed)
+        
+        sorted_decades = sorted(decades, key=decade_sort_key)
+        self.view.update_decade_filter(sorted_decades)
         
         # Apply current filter
         filtered_stamps = self.get_filtered_stamps()

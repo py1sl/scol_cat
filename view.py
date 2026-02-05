@@ -21,29 +21,6 @@ from model import Stamp
 from typing import Callable
 
 
-def _parse_decade_for_sorting(decade_str: str) -> Optional[int]:
-    """
-    Parse a decade string for sorting purposes.
-    
-    Args:
-        decade_str: Decade string (e.g., "1840s", "1850s", "Unknown")
-        
-    Returns:
-        The decade as an integer (e.g., 1840), or None if it's "Unknown" or invalid
-    """
-    if decade_str == "Unknown":
-        return None
-    
-    try:
-        # Parse strings like "1840s" -> 1840
-        if decade_str.endswith('s'):
-            return int(decade_str[:-1])
-        else:
-            return int(decade_str)
-    except ValueError:
-        return None
-
-
 class StampDialog(QDialog):
     """Dialog for adding or editing a stamp entry."""
     
@@ -735,7 +712,7 @@ class MainWindow(QMainWindow):
         Update the decade filter dropdown with available decades.
         
         Args:
-            decades: List of decade strings to add to the filter.
+            decades: List of decade strings to add to the filter (should be pre-sorted).
         """
         current_selection = self.decade_filter.currentText()
         self.decade_filter.clear()
@@ -743,18 +720,8 @@ class MainWindow(QMainWindow):
         # Add "All Decades" as first option
         self.decade_filter.addItem("All Decades")
         
-        # Sort decades: numeric decades first (chronologically), then "Unknown"
-        def decade_sort_key(decade):
-            parsed = _parse_decade_for_sorting(decade)
-            if parsed is None:
-                return (1, "")  # Put Unknown/invalid at the end
-            else:
-                return (0, parsed)
-        
-        sorted_decades = sorted(decades, key=decade_sort_key)
-        
-        # Add unique decades
-        for decade in sorted_decades:
+        # Add decades (assumed to be already sorted by Controller)
+        for decade in decades:
             if decade:  # Only add non-empty decades
                 self.decade_filter.addItem(decade)
         
