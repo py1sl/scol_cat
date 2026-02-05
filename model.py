@@ -12,96 +12,116 @@ import uuid
 import pandas as pd
 
 
-def parse_date_field(date_str: str) -> Optional[int]:
-    """
-    Parse a date field and return a representative year.
+class DateUtils:
+    """Utility class for date parsing and manipulation."""
     
-    Handles:
-    - Single year: "1840" -> 1840
-    - Year range with dash: "1840-1850" -> 1845 (mid-year)
-    - Year range with 'to': "1840 to 1850" -> 1845 (mid-year)
-    - Circa dates: "circa 1840" -> 1840
-    
-    Args:
-        date_str: The date string to parse
+    @staticmethod
+    def parse_date_field(date_str: str) -> Optional[int]:
+        """
+        Parse a date field and return a representative year.
         
-    Returns:
-        The representative year, or None if parsing fails
-    """
-    if not date_str or not isinstance(date_str, str):
+        Handles:
+        - Single year: "1840" -> 1840
+        - Year range with dash: "1840-1850" -> 1845 (mid-year)
+        - Year range with 'to': "1840 to 1850" -> 1845 (mid-year)
+        - Circa dates: "circa 1840" -> 1840
+        
+        Args:
+            date_str: The date string to parse
+            
+        Returns:
+            The representative year, or None if parsing fails
+        """
+        if not date_str or not isinstance(date_str, str):
+            return None
+        
+        # Clean up the string
+        date_str = date_str.strip()
+        if not date_str:
+            return None
+        
+        # Handle circa dates - remove "circa", "c.", "ca." (case insensitive)
+        circa_pattern = r'^(circa|c\.|ca\.)\s*'
+        date_str = re.sub(circa_pattern, '', date_str, flags=re.IGNORECASE).strip()
+        
+        # Try to match year range with dash (e.g., "1840-1850")
+        range_dash_pattern = r'^(\d{4})\s*-\s*(\d{4})$'
+        match = re.match(range_dash_pattern, date_str)
+        if match:
+            start_year = int(match.group(1))
+            end_year = int(match.group(2))
+            # Return mid-year
+            return (start_year + end_year) // 2
+        
+        # Try to match year range with 'to' (e.g., "1840 to 1850")
+        range_to_pattern = r'^(\d{4})\s+to\s+(\d{4})$'
+        match = re.match(range_to_pattern, date_str, flags=re.IGNORECASE)
+        if match:
+            start_year = int(match.group(1))
+            end_year = int(match.group(2))
+            # Return mid-year
+            return (start_year + end_year) // 2
+        
+        # Try to match single year (e.g., "1840")
+        single_year_pattern = r'^(\d{4})$'
+        match = re.match(single_year_pattern, date_str)
+        if match:
+            return int(match.group(1))
+        
+        # Could not parse
         return None
     
-    # Clean up the string
-    date_str = date_str.strip()
-    if not date_str:
-        return None
+    @staticmethod
+    def get_decade_from_year(year: int) -> int:
+        """
+        Get the decade for a given year.
+        
+        Args:
+            year: The year
+            
+        Returns:
+            The decade (e.g., 1840 for year 1845)
+        """
+        return (year // 10) * 10
     
-    # Handle circa dates - remove "circa", "c.", "ca." (case insensitive)
-    circa_pattern = r'^(circa|c\.|ca\.)\s*'
-    date_str = re.sub(circa_pattern, '', date_str, flags=re.IGNORECASE).strip()
-    
-    # Try to match year range with dash (e.g., "1840-1850")
-    range_dash_pattern = r'^(\d{4})\s*-\s*(\d{4})$'
-    match = re.match(range_dash_pattern, date_str)
-    if match:
-        start_year = int(match.group(1))
-        end_year = int(match.group(2))
-        # Return mid-year
-        return (start_year + end_year) // 2
-    
-    # Try to match year range with 'to' (e.g., "1840 to 1850")
-    range_to_pattern = r'^(\d{4})\s+to\s+(\d{4})$'
-    match = re.match(range_to_pattern, date_str, flags=re.IGNORECASE)
-    if match:
-        start_year = int(match.group(1))
-        end_year = int(match.group(2))
-        # Return mid-year
-        return (start_year + end_year) // 2
-    
-    # Try to match single year (e.g., "1840")
-    single_year_pattern = r'^(\d{4})$'
-    match = re.match(single_year_pattern, date_str)
-    if match:
-        return int(match.group(1))
-    
-    # Could not parse
-    return None
+    @staticmethod
+    def parse_decade_string(decade_str: str) -> Optional[int]:
+        """
+        Parse a decade string to get its numeric value.
+        
+        Args:
+            decade_str: Decade string (e.g., "1840s", "1850s", "Unknown")
+            
+        Returns:
+            The decade as an integer (e.g., 1840), or None if it's "Unknown" or invalid
+        """
+        if decade_str == "Unknown":
+            return None
+        
+        try:
+            # Parse strings like "1840s" -> 1840
+            if decade_str.endswith('s'):
+                return int(decade_str[:-1])
+            else:
+                return int(decade_str)
+        except ValueError:
+            return None
+
+
+# Backward compatibility: Keep module-level functions as aliases
+def parse_date_field(date_str: str) -> Optional[int]:
+    """Parse a date field and return a representative year. See DateUtils.parse_date_field."""
+    return DateUtils.parse_date_field(date_str)
 
 
 def get_decade_from_year(year: int) -> int:
-    """
-    Get the decade for a given year.
-    
-    Args:
-        year: The year
-        
-    Returns:
-        The decade (e.g., 1840 for year 1845)
-    """
-    return (year // 10) * 10
+    """Get the decade for a given year. See DateUtils.get_decade_from_year."""
+    return DateUtils.get_decade_from_year(year)
 
 
 def parse_decade_string(decade_str: str) -> Optional[int]:
-    """
-    Parse a decade string to get its numeric value.
-    
-    Args:
-        decade_str: Decade string (e.g., "1840s", "1850s", "Unknown")
-        
-    Returns:
-        The decade as an integer (e.g., 1840), or None if it's "Unknown" or invalid
-    """
-    if decade_str == "Unknown":
-        return None
-    
-    try:
-        # Parse strings like "1840s" -> 1840
-        if decade_str.endswith('s'):
-            return int(decade_str[:-1])
-        else:
-            return int(decade_str)
-    except ValueError:
-        return None
+    """Parse a decade string to get its numeric value. See DateUtils.parse_decade_string."""
+    return DateUtils.parse_decade_string(decade_str)
 
 
 @dataclass

@@ -37,6 +37,29 @@ class StampController:
         """Start the application."""
         self.view.show()
     
+    def validate_stamp_data(self, name: str, image_path: str, exclude_id: Optional[str] = None) -> Optional[str]:
+        """
+        Validate stamp data for uniqueness.
+        
+        Args:
+            name: Stamp name to validate
+            image_path: Image path to validate
+            exclude_id: Optional ID to exclude from validation (for editing)
+            
+        Returns:
+            Error message if validation fails, None if validation passes
+        """
+        # Check if name is already in use
+        if name and self.database.is_name_in_use(name, exclude_id):
+            return f"The name '{name}' is already in use by another stamp.\nPlease choose a different name."
+        
+        # Check if image path is already in use
+        if image_path and self.database.is_image_path_in_use(image_path, exclude_id):
+            import os
+            return f"The image path '{os.path.basename(image_path)}' is already in use by another stamp.\nPlease choose a different image."
+        
+        return None
+    
     def load_database(self):
         """Load a database from a JSON file."""
         file_path, _ = QFileDialog.getOpenFileName(
@@ -145,7 +168,7 @@ class StampController:
     
     def add_stamp(self):
         """Add a new stamp to the collection."""
-        dialog = StampDialog(self.view, database=self.database)
+        dialog = StampDialog(self.view, validation_callback=self.validate_stamp_data)
         
         if dialog.exec():
             stamp = dialog.get_stamp_data()
@@ -172,7 +195,7 @@ class StampController:
             )
             return
         
-        dialog = StampDialog(self.view, stamp, database=self.database)
+        dialog = StampDialog(self.view, stamp, validation_callback=self.validate_stamp_data)
         
         if dialog.exec():
             updated_stamp = dialog.get_stamp_data()
